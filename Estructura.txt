@@ -1,23 +1,101 @@
+Arquitectura ideal del proyecto
+
+Plugin: PCC-WooOTEC-Chile
+
+Objetivo: integrar Moodle, WordPress y WooCommerce para una OTEC con automatización completa de cursos, ventas y matrículas.
+
+1. Arquitectura general del sistema
+
+Sistema dividido en 3 capas.
+
+CAPA 1
+Frontend Comercial
+
+WordPress
+WooCommerce
+Elementor
+Landing Pages
+Catálogo cursos
+Checkout
+Webpay
+CAPA 2
+Plugin de integración
+
+PCC-WooOTEC-Chile
+CAPA 3
+Sistema educativo
+
+Moodle
+Cursos
+Aula virtual
+Evaluaciones
+Certificados
+
+El plugin funciona como middleware entre WordPress y Moodle.
+
+2. Flujo completo del negocio
+
+Este es el flujo final del sistema cuando todo esté funcionando.
+
+Administrador crea curso en Moodle
+        ↓
+Plugin sincroniza curso
+        ↓
+Curso aparece como producto WooCommerce
+        ↓
+Alumno entra al sitio
+        ↓
+Compra curso
+        ↓
+Pago aprobado (Webpay)
+        ↓
+WooCommerce completa orden
+        ↓
+Plugin ejecuta matrícula automática
+        ↓
+Crear usuario WordPress
+        ↓
+Crear usuario Moodle
+        ↓
+Matricular curso
+        ↓
+Enviar correo acceso
+        ↓
+Alumno entra al aula virtual
+3. Estructura ideal del plugin
+
+Esto es la estructura final recomendada.
+
 pcc-woootec-chile
 │
 ├─ pcc-woootec-chile.php
+│
+├─ core
+│   ├─ bootstrap.php
+│   ├─ hooks.php
+│   ├─ installer.php
+│   ├─ loader.php
+│   └─ logger.php
 │
 ├─ admin
 │   ├─ admin-menu.php
 │   ├─ dashboard.php
 │   ├─ settings-page.php
-│   └─ sync-page.php
-│
-├─ core
-│   ├─ hooks.php
-│   ├─ installer.php
-│   └─ logger.php
+│   ├─ sync-page.php
+│   └─ license-page.php
 │
 ├─ includes
 │   ├─ moodle-api.php
 │   ├─ course-sync.php
 │   ├─ enrollment.php
+│   ├─ user-manager.php
 │   └─ license.php
+│
+├─ services
+│   ├─ course-service.php
+│   ├─ user-service.php
+│   ├─ enrollment-service.php
+│   └─ email-service.php
 │
 ├─ templates
 │   ├─ dashboard-view.php
@@ -37,55 +115,168 @@ pcc-woootec-chile
 │       ├─ sync-icon.svg
 │       └─ course-icon.svg
 │
-└─ readme.txt
+└─ languages
+    └─ pcc-woootec.pot
+4. Responsabilidad de cada módulo
+core
 
+Infraestructura del plugin.
 
+bootstrap
+hooks globales
+instalación
+logs
+admin
 
+Panel administrativo.
 
+dashboard
+configuración
+sincronización cursos
+licencias
+logs
+includes
 
-Flujo general:
+Integraciones externas.
 
-Administrador entra al panel
+API Moodle
+sincronización
+matrícula
+licencia
+services
 
-↓
+Lógica del negocio.
 
-Sincronizar cursos
+Aquí vive la verdadera inteligencia del plugin.
 
-↓
+crear cursos
+crear usuarios
+matricular alumnos
+enviar correos
+templates
 
-course-sync.php consulta Moodle
+HTML limpio del panel admin.
 
-↓
+assets
 
-moodle-api.php obtiene cursos
+Recursos visuales.
 
-↓
+css
+javascript
+iconos
+5. Flujo técnico del plugin
 
-WooCommerce crea productos
+Este es el flujo interno del código.
 
-↓
+WordPress carga plugin
+        ↓
+bootstrap.php inicia sistema
+        ↓
+hooks.php registra hooks
+sincronización cursos
+admin → botón sincronizar
+        ↓
+course-sync.php
+        ↓
+moodle-api.php
+        ↓
+course-service.php
+        ↓
+crear productos WooCommerce
+compra curso
+usuario compra curso
+        ↓
+WooCommerce crea orden
+        ↓
+pago aprobado
+        ↓
+woocommerce_order_status_completed
+        ↓
+hooks.php
+        ↓
+enrollment-service.php
+matrícula automática
+obtener usuario WP
+        ↓
+verificar usuario Moodle
+        ↓
+crear usuario Moodle si no existe
+        ↓
+matricular curso
+        ↓
+guardar relación
+6. Base de datos del plugin
 
-Alumno compra curso
+Tablas recomendadas.
 
-↓
+wp_pcc_courses
+wp_pcc_enrollments
+wp_pcc_logs
+wp_pcc_license
+tabla cursos
+id
+moodle_course_id
+woo_product_id
+sync_date
+tabla matrículas
+id
+wp_user_id
+moodle_user_id
+course_id
+order_id
+date
+tabla logs
+id
+type
+message
+date
+7. Automatizaciones del sistema
 
-WooCommerce order completed
+Procesos automáticos del plugin.
 
-↓
+sincronización
+manual
+cron diario
+verificación licencia
+cada 24 horas
+limpieza logs
+cron semanal
+8. Escalabilidad futura
 
-hooks.php ejecuta enrollment.php
+Si el plugin crece se pueden agregar:
 
-↓
+certificados automáticos
+reportes OTEC
+integración SENCE
+panel alumno WordPress
+estadísticas cursos
+API REST
+9. Panel final del plugin
 
-enrollment.php crea usuario Moodle
+En WordPress aparecerá:
 
-↓
+PCC WooOTEC
 
-enrollment.php matricula curso
+Menú:
 
-↓
+Dashboard
+Cursos
+Sincronizar Moodle
+Configuración
+Licencia
+Logs
+10. Resultado final del sistema
 
-WordPress envía correo
+Cuando todo esté terminado tendrás:
+
+Cursos creados en Moodle
+Cursos publicados automáticamente
+Ventas WooCommerce
+Pagos Webpay
+Creación automática alumnos
+Matrícula automática
+Correo automático
+Acceso inmediato al aula
 
 
 

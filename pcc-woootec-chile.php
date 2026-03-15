@@ -73,6 +73,7 @@ require_once PCC_WOOOTEC_PATH.'includes/course-sync.php';
 require_once PCC_WOOOTEC_PATH.'includes/license.php';
 
 require_once PCC_WOOOTEC_PATH.'admin/admin-menu.php';
+require_once PCC_WOOOTEC_PATH.'admin/dashboard.php';
 require_once PCC_WOOOTEC_PATH.'admin/sync-page.php';
 
 
