@@ -28,16 +28,16 @@ function pcc_moodle_get_student_role_id() {
 }
 
 function pcc_moodle_log($message, $context = array()) {
+    if (class_exists('PCC_Logger')) {
+        PCC_Logger::log($message, 'info', $context, false);
+        return;
+    }
+
     if (!empty($context) && is_array($context)) {
         if (isset($context['wstoken'])) {
             $context['wstoken'] = '***';
         }
         $message .= ' | ' . wp_json_encode($context);
-    }
-
-    if (function_exists('pcc_log')) {
-        pcc_log($message);
-        return;
     }
 
     error_log('[PCC-WooOTEC] ' . $message);
@@ -135,7 +135,11 @@ function pcc_moodle_request_raw($function, $params = array(), $request_args = ar
 function pcc_moodle_request($function, $params = array(), $request_args = array()) {
     $result = pcc_moodle_request_raw($function, $params, $request_args);
     if (is_wp_error($result)) {
-        pcc_moodle_log('Error Moodle request', array('wsfunction' => $function, 'error' => $result->get_error_message()));
+        if (class_exists('PCC_Logger')) {
+            PCC_Logger::error('Error Moodle request', array('wsfunction' => $function, 'error' => $result->get_error_message()));
+        } else {
+            pcc_moodle_log('Error Moodle request', array('wsfunction' => $function, 'error' => $result->get_error_message()));
+        }
         return false;
     }
     return $result;

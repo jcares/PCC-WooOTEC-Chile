@@ -109,7 +109,8 @@ function pcc_enroll_user($order_id) {
         set_transient('pcc_moodle_pw_' . (int) $order_id, $created_password, $ttl);
     }
 
-    pcc_send_moodle_access_email($user, $order, $created_password, $course_ids);
+    $send_password = (bool) apply_filters('pcc_send_moodle_password_email', true, $order_id, $user->ID);
+    pcc_send_moodle_access_email($user, $order, $send_password ? $created_password : null, $course_ids);
 
     if ($created_password !== null) {
         delete_transient('pcc_moodle_pw_' . (int) $order_id);
@@ -165,4 +166,3 @@ function pcc_send_moodle_access_email($user, $order, $moodle_password = null, $c
     $headers = array('Content-Type: text/plain; charset=UTF-8');
     return wp_mail($user->user_email, $subject, implode("\n", $lines), $headers);
 }
-

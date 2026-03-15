@@ -91,6 +91,11 @@ function pcc_create_course_product($course){
 
     $product->set_regular_price('49000');
 
+    $category_id = (int) get_option('pcc_wc_course_category', 0);
+    if ($category_id > 0) {
+        $product->set_category_ids(array($category_id));
+    }
+
     $product_id = $product->save();
 
     update_post_meta($product_id,'moodle_course_id',$course->id);
@@ -121,6 +126,11 @@ function pcc_update_course_product($product_id,$course){
 
     if(!empty($course->summary)){
         $product->set_description($course->summary);
+    }
+
+    $category_id = (int) get_option('pcc_wc_course_category', 0);
+    if ($category_id > 0) {
+        $product->set_category_ids(array($category_id));
     }
 
     $product->save();
@@ -195,18 +205,3 @@ function pcc_set_course_image($product_id,$image_url){
 
 
 
-/*
-----------------------------------------------------
-LOGS DEL PLUGIN
-----------------------------------------------------
-*/
-
-function pcc_log($message){
-
-    if(!is_string($message)){
-        $message = json_encode($message);
-    }
-
-    error_log("[PCC-WooOTEC] ".$message);
-
-}

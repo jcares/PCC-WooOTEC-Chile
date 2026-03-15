@@ -4,8 +4,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-add_action('admin_menu', 'pcc_woootec_menu');
-
 function pcc_woootec_menu() {
     add_menu_page(
         'PCC WooOTEC Chile',
@@ -19,6 +17,15 @@ function pcc_woootec_menu() {
 
     add_submenu_page(
         'pcc-woootec',
+        'Configuración',
+        'Settings',
+        'manage_options',
+        'pcc-settings',
+        'pcc_settings_page'
+    );
+
+    add_submenu_page(
+        'pcc-woootec',
         'Sincronizar cursos',
         'Sincronizar cursos',
         'manage_options',
@@ -26,4 +33,3 @@ function pcc_woootec_menu() {
         'pcc_sync_page'
     );
 }
-
