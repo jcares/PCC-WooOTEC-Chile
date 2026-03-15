@@ -35,6 +35,15 @@ function pcc_woootec_menu() {
 
     add_submenu_page(
         'pcc-woootec',
+        'Logs',
+        'Logs',
+        'manage_options',
+        'pcc-logs',
+        'pcc_logs_page'
+    );
+
+    add_submenu_page(
+        'pcc-woootec',
         'Sincronizar cursos',
         'Sincronizar cursos',
         'manage_options',

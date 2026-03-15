@@ -48,6 +48,7 @@ class PCC_WooOTEC {
             require_once PCC_WOOOTEC_PATH . 'admin/dashboard.php';
             require_once PCC_WOOOTEC_PATH . 'admin/settings-page.php';
             require_once PCC_WOOOTEC_PATH . 'admin/retry-page.php';
+            require_once PCC_WOOOTEC_PATH . 'admin/logs-page.php';
             require_once PCC_WOOOTEC_PATH . 'admin/sync-page.php';
         }
     }

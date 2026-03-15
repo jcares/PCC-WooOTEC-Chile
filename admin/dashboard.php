@@ -92,11 +92,10 @@ function pcc_dashboard() {
                 <img alt="" src="<?php echo esc_url(PCC_WOOOTEC_URL . 'assets/img/sync-icon.svg'); ?>">
                 <h3>Logs</h3>
                 <p>Revisar eventos y matrículas (por ahora en error_log).</p>
-                <a href="#" class="button">Ver Logs</a>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=pcc-logs')); ?>" class="button">Ver Logs</a>
             </div>
         </div>
     </div>
 
     <?php
 }
-

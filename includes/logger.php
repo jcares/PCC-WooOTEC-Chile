@@ -69,6 +69,10 @@ class PCC_Logger {
         return null;
     }
 
+    public static function get_log_path() {
+        return self::get_log_file_path();
+    }
+
     private static function ensure_dir($dir) {
         if (!is_dir($dir)) {
             wp_mkdir_p($dir);
