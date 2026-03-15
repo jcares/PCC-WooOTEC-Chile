@@ -26,6 +26,15 @@ function pcc_woootec_menu() {
 
     add_submenu_page(
         'pcc-woootec',
+        'Reintentos',
+        'Reintentos',
+        'manage_options',
+        'pcc-retries',
+        'pcc_retry_page'
+    );
+
+    add_submenu_page(
+        'pcc-woootec',
         'Sincronizar cursos',
         'Sincronizar cursos',
         'manage_options',

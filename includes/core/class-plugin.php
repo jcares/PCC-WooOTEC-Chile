@@ -14,10 +14,30 @@ class PCC_WooOTEC {
         if (!get_option('pcc_license_status')) {
             update_option('pcc_license_status', 'inactive');
         }
+
+        if (!defined('PCC_WOOOTEC_PATH')) {
+            return;
+        }
+
+        require_once PCC_WOOOTEC_PATH . 'includes/logger.php';
+        require_once PCC_WOOOTEC_PATH . 'includes/cron.php';
+
+        PCC_WooOTEC_Cron::install_table();
+        PCC_WooOTEC_Cron::ensure_scheduled();
+    }
+
+    public static function deactivate() {
+        if (!defined('PCC_WOOOTEC_PATH')) {
+            return;
+        }
+
+        require_once PCC_WOOOTEC_PATH . 'includes/cron.php';
+        PCC_WooOTEC_Cron::unschedule();
     }
 
     private function load_dependencies() {
         require_once PCC_WOOOTEC_PATH . 'includes/logger.php';
+        require_once PCC_WOOOTEC_PATH . 'includes/cron.php';
         require_once PCC_WOOOTEC_PATH . 'includes/moodle-api.php';
         require_once PCC_WOOOTEC_PATH . 'includes/enrollment.php';
         require_once PCC_WOOOTEC_PATH . 'includes/course-sync.php';
@@ -27,6 +47,7 @@ class PCC_WooOTEC {
             require_once PCC_WOOOTEC_PATH . 'admin/admin-menu.php';
             require_once PCC_WOOOTEC_PATH . 'admin/dashboard.php';
             require_once PCC_WOOOTEC_PATH . 'admin/settings-page.php';
+            require_once PCC_WOOOTEC_PATH . 'admin/retry-page.php';
             require_once PCC_WOOOTEC_PATH . 'admin/sync-page.php';
         }
     }
@@ -40,6 +61,10 @@ class PCC_WooOTEC {
         add_action('admin_enqueue_scripts', array($this, 'admin_assets'));
 
         add_action('woocommerce_order_status_completed', array($this, 'handle_order_completed'));
+
+        add_filter('cron_schedules', array('PCC_WooOTEC_Cron', 'add_cron_schedule'));
+        add_action('init', array('PCC_WooOTEC_Cron', 'ensure_scheduled'));
+        add_action(PCC_WooOTEC_Cron::CRON_HOOK, array('PCC_WooOTEC_Cron', 'retry_failed_enrollments'));
     }
 
     public function check_dependencies() {

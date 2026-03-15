@@ -62,6 +62,11 @@ function pcc_enroll_user($order_id) {
         $create_info = pcc_moodle_get_or_create_user_with_password($user);
         if (!$create_info || empty($create_info['id'])) {
             pcc_moodle_log('Falló creación/búsqueda de usuario Moodle', array('order_id' => (int) $order_id, 'user_id' => (int) $user->ID));
+            if (class_exists('PCC_WooOTEC_Cron')) {
+                foreach ($course_ids as $course_id) {
+                    PCC_WooOTEC_Cron::enqueue_failed($order_id, $user->user_email, (int) $course_id, 'Falló creación/búsqueda de usuario Moodle');
+                }
+            }
             return false;
         }
 
@@ -92,6 +97,9 @@ function pcc_enroll_user($order_id) {
             $already[] = $course_id;
         } else {
             $failed[] = $course_id;
+            if (class_exists('PCC_WooOTEC_Cron')) {
+                PCC_WooOTEC_Cron::enqueue_failed($order_id, $user->user_email, $course_id, 'Falló matrícula inicial');
+            }
         }
     }
 

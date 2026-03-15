@@ -17,6 +17,6 @@ define('PCC_WOOOTEC_URL', plugin_dir_url(__FILE__));
 require_once PCC_WOOOTEC_PATH . 'includes/core/class-plugin.php';
 
 register_activation_hook(__FILE__, array('PCC_WooOTEC', 'activate'));
+register_deactivation_hook(__FILE__, array('PCC_WooOTEC', 'deactivate'));
 
 (new PCC_WooOTEC())->init();
-
