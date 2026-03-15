@@ -1,0 +1,339 @@
+pcc-woootec-chile
+│
+├─ pcc-woootec-chile.php
+│
+├─ admin
+│   ├─ admin-menu.php
+│   ├─ dashboard.php
+│   ├─ settings-page.php
+│   └─ sync-page.php
+│
+├─ core
+│   ├─ hooks.php
+│   ├─ installer.php
+│   └─ logger.php
+│
+├─ includes
+│   ├─ moodle-api.php
+│   ├─ course-sync.php
+│   ├─ enrollment.php
+│   └─ license.php
+│
+├─ templates
+│   ├─ dashboard-view.php
+│   ├─ settings-view.php
+│   └─ sync-view.php
+│
+├─ assets
+│   ├─ css
+│   │   └─ admin-style.css
+│   │
+│   ├─ js
+│   │   └─ admin.js
+│   │
+│   └─ img
+│       ├─ plugin-icon.png
+│       ├─ moodle-icon.svg
+│       ├─ sync-icon.svg
+│       └─ course-icon.svg
+│
+└─ readme.txt
+
+
+
+
+
+Flujo general:
+
+Administrador entra al panel
+
+↓
+
+Sincronizar cursos
+
+↓
+
+course-sync.php consulta Moodle
+
+↓
+
+moodle-api.php obtiene cursos
+
+↓
+
+WooCommerce crea productos
+
+↓
+
+Alumno compra curso
+
+↓
+
+WooCommerce order completed
+
+↓
+
+hooks.php ejecuta enrollment.php
+
+↓
+
+enrollment.php crea usuario Moodle
+
+↓
+
+enrollment.php matricula curso
+
+↓
+
+WordPress envía correo
+
+
+
+
+1. Qué debe controlar la licencia
+
+La licencia debe validar:
+
+dominio
+clave licencia
+estado licencia
+fecha expiración
+
+Ejemplo de licencia:
+
+PCC-OTEC-2026-AB12-CD34
+2. Servidor de licencias
+
+Tendrás un pequeño API propio.
+
+Por ejemplo:
+
+https://licencias.pccurico.cl/api/validate
+
+El plugin enviará:
+
+license_key
+domain
+plugin_version
+
+Respuesta del servidor:
+
+{
+"status":"valid",
+"expires":"2027-01-01",
+"domain":"cliente.cl"
+}
+
+Si la licencia es inválida:
+
+{
+"status":"invalid"
+}
+3. Pantalla de activación del plugin
+
+En el panel del plugin aparecerá:
+
+PCC WooOTEC
+   ├ Configuración
+   ├ Licencia
+   ├ Sincronizar cursos
+   ├ Logs
+
+Pantalla licencia:
+
+----------------------------------
+Activación del plugin
+
+Clave de licencia
+
+[________________________]
+
+[ Activar licencia ]
+
+Estado licencia:
+No activada
+----------------------------------
+
+Cuando se activa:
+
+Licencia activa
+
+Dominio: cliente.cl
+Expira: 12-06-2027
+4. Código base del sistema de licencia
+
+Archivo:
+
+includes/license.php
+
+Código:
+
+function pcc_validate_license($key){
+
+$domain = $_SERVER['SERVER_NAME'];
+
+$response = wp_remote_post(
+'https://licencias.pccurico.cl/api/validate',
+array(
+'body'=>array(
+'license_key'=>$key,
+'domain'=>$domain
+)
+)
+);
+
+if(is_wp_error($response)){
+return false;
+}
+
+$data = json_decode(
+wp_remote_retrieve_body($response),
+true
+);
+
+if($data['status']=="valid"){
+return true;
+}
+
+return false;
+
+}
+5. Guardar licencia en WordPress
+
+Cuando el admin presiona activar licencia:
+
+update_option(
+'pcc_license_key',
+sanitize_text_field($_POST['license_key'])
+);
+6. Bloquear plugin si no hay licencia
+
+En el plugin principal:
+
+pcc-woootec-chile.php
+
+agregas algo así:
+
+$license = get_option('pcc_license_status');
+
+if($license!="valid"){
+
+add_action('admin_notices',function(){
+
+echo "<div class='notice notice-error'>
+<p>PCC-WooOTEC requiere activación de licencia</p>
+</div>";
+
+});
+
+return;
+
+}
+7. Tipos de licencia que podrías vender
+
+Esto es importante desde ahora.
+
+Starter
+1 dominio
+actualizaciones 1 año
+
+Professional
+3 dominios
+
+OTEC Enterprise
+dominios ilimitados
+soporte prioritario
+8. Seguridad mínima
+
+El sistema debe validar:
+
+dominio real
+clave válida
+checksum
+
+Para evitar que alguien haga:
+
+update_option("pcc_license_status","valid")
+9. Cosas que NO debes hacer
+
+Error clásico:
+
+Validar licencia en cada carga de página.
+
+Eso mata el rendimiento.
+
+Lo correcto:
+
+validar licencia cada 24 horas
+guardar estado local
+10. Flujo real del plugin completo
+
+Cuando todo esté terminado el flujo del sistema será:
+
+Instalar plugin
+Activar licencia
+
+↓
+
+Sincronizar cursos Moodle
+
+↓
+
+Cursos aparecen en WooCommerce
+
+↓
+
+Alumno compra curso
+
+↓
+
+Pago Webpay aprobado
+
+↓
+
+Crear usuario WordPress
+
+↓
+
+Crear usuario Moodle
+
+↓
+
+Matricular curso
+
+↓
+
+Enviar correo
+
+↓
+
+Alumno accede al Aula Virtual
+
+Ahora viene la decisión arquitectónica más importante de todo el plugin.
+
+Y si esto se hace mal, todo se vuelve frágil.
+
+Debemos decidir cómo se comunicará el plugin con Moodle.
+
+Hay tres métodos posibles:
+
+1️⃣ Moodle WebService API
+2️⃣ Token REST API
+3️⃣ API personalizada Moodle
+
+Uno de esos es 10 veces más estable para este proyecto.
+
+Los otros dos funcionan… hasta que dejan de funcionar justo cuando tienes 300 alumnos comprando cursos. Y ahí empiezan los insultos tecnológicos.
+
+Así que el siguiente paso lógico es definir la arquitectura de conexión WordPress ↔ Moodle antes de seguir escribiendo código como si la gravedad no existiera.
+
+Starter
+1 dominio
+actualizaciones 1 año
+
+Professional
+3 dominios
+
+OTEC Enterprise
+dominios ilimitados
+soporte prioritario

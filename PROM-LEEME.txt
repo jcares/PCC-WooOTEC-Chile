@@ -1,0 +1,294 @@
+PROM DEL PROYECTO
+PLATAFORMA OTEC AUTOMATIZADA
+
+Nombre del Plugin:
+PCC-WooOTEC-Chile
+
+
+1. OBJETIVO DEL SISTEMA
+
+Construir una plataforma automatizada de venta y gestión de cursos OTEC donde:
+
+Moodle administra:
+- Cursos
+- Contenidos
+- Evaluaciones
+- Aula virtual
+- Progreso del alumno
+- Certificados
+
+WordPress administra:
+- Publicación de cursos
+- Landing pages
+- Creación de alumnos
+- Envío de correos
+- Integración con WooCommerce
+
+WooCommerce administra:
+- Productos (cursos)
+- Ventas
+- Pagos
+- Órdenes
+
+Los pagos se procesarán mediante Webpay de Transbank en Chile.
+
+Todo el sistema se conectará mediante un plugin propio llamado:
+
+PCC-WooOTEC-Chile
+
+
+2. ARQUITECTURA GENERAL DEL SISTEMA
+
+La arquitectura del sistema se divide en dos plataformas independientes.
+
+
+SERVIDOR 1
+Plataforma comercial
+
+Software:
+WordPress
+WooCommerce
+Plugin PCC-WooOTEC-Chile
+
+Funciones:
+- catálogo de cursos
+- ventas
+- pagos
+- creación de usuarios
+- correos automáticos
+- integración con Moodle
+
+
+SERVIDOR 2
+Plataforma educativa
+
+Software:
+Moodle
+
+Funciones:
+- cursos
+- contenido educativo
+- evaluaciones
+- seguimiento del alumno
+- certificación
+
+
+3. FLUJO COMPLETO DEL SISTEMA
+
+El flujo principal del sistema será el siguiente:
+
+Administrador crea curso en Moodle
+
+↓
+
+Plugin PCC-WooOTEC-Chile sincroniza cursos
+
+↓
+
+Cursos aparecen como productos en WooCommerce
+
+↓
+
+Alumno compra curso en WordPress
+
+↓
+
+Pago aprobado mediante Webpay
+
+↓
+
+WooCommerce marca la orden como "completed"
+
+↓
+
+Plugin ejecuta automatización
+
+↓
+
+Se crea usuario en WordPress (si no existe)
+
+↓
+
+Plugin crea usuario en Moodle
+
+↓
+
+Plugin matricula alumno al curso correspondiente
+
+↓
+
+WordPress envía correo automático
+
+↓
+
+Alumno recibe acceso al Aula Virtual
+
+↓
+
+Alumno accede a Moodle y comienza el curso
+
+
+4. FUNCIONES PRINCIPALES DEL PLUGIN
+
+El plugin PCC-WooOTEC-Chile deberá incluir las siguientes funciones.
+
+
+SINCRONIZACIÓN DE CURSOS
+
+Botón administrador:
+
+"Sincronizar cursos Moodle → WooCommerce"
+
+Acciones:
+- consultar API de Moodle
+- obtener lista de cursos
+- crear productos WooCommerce
+- actualizar cursos existentes
+- registrar cambios en logs
+
+
+MATRÍCULA AUTOMÁTICA
+
+Evento disparador:
+
+woocommerce_order_status_completed
+
+Cuando una orden cambia a completada:
+
+El plugin debe:
+- identificar cursos comprados
+- identificar usuario comprador
+- crear usuario en Moodle si no existe
+- matricular usuario en el curso
+
+
+ENVÍO AUTOMÁTICO DE CORREO
+
+Cuando se completa la matrícula:
+
+El sistema enviará un correo con:
+
+- bienvenida al curso
+- enlace al aula virtual
+- usuario
+- contraseña
+- nombre del curso
+
+
+5. PANEL DE ADMINISTRACIÓN DEL PLUGIN
+
+El plugin agregará un menú en WordPress.
+
+Menú principal:
+
+PCC WooOTEC
+
+
+Submenús:
+
+Dashboard
+Configuración
+Sincronizar cursos
+Logs
+
+
+6. CONFIGURACIÓN DEL PLUGIN
+
+El panel de configuración debe permitir definir:
+
+URL del servidor Moodle
+
+Token de API de Moodle
+
+Rol de estudiante en Moodle
+
+URL del Aula Virtual
+
+Correo remitente
+
+Precio por defecto de cursos
+
+Activar o desactivar sincronización automática
+
+
+7. BASE DE DATOS DEL PLUGIN
+
+El plugin creará tablas propias en WordPress.
+
+
+Tabla: wp_pcc_courses
+
+Campos:
+
+id
+moodle_course_id
+woo_product_id
+sync_date
+
+
+Tabla: wp_pcc_enrollments
+
+Campos:
+
+id
+user_id_wp
+user_id_moodle
+course_id
+order_id
+date
+
+
+Tabla: wp_pcc_logs
+
+Campos:
+
+id
+type
+message
+date
+
+
+8. SEGURIDAD DEL SISTEMA
+
+El plugin debe incluir:
+
+validación nonce en formularios
+
+validación de permisos de administrador
+
+validación de respuesta de WooCommerce
+
+manejo seguro del token API de Moodle
+
+registro de logs de errores
+
+protección contra ejecuciones duplicadas
+
+
+9. EXPERIENCIA DEL USUARIO FINAL
+
+Proceso para el alumno:
+
+1. alumno entra al sitio web
+2. selecciona curso
+3. realiza compra
+4. paga mediante Webpay
+5. recibe correo automático
+6. accede al Aula Virtual
+7. comienza el curso
+
+
+10. RESULTADO FINAL ESPERADO
+
+El sistema debe permitir que una OTEC opere con automatización completa:
+
+- cursos creados en Moodle
+- cursos publicados automáticamente en WordPress
+- ventas automáticas
+- pagos automáticos
+- creación automática de alumnos
+- matrícula automática en cursos
+- envío automático de credenciales
+- acceso inmediato al aula virtual
+
+Sin intervención manual del administrador.
