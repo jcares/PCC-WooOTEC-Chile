@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: PCC-WooOTEC-Chile
-Description: Integracion Moodle + WooCommerce para OTEC Chile. Sincroniza cursos, gestiona pagos y matriculas automaticas.
-Version: 1.0.0
+Description: Integración Moodle + WooCommerce para OTEC Chile. Sincroniza cursos, gestiona pagos y matrículas automáticas.
+Version: 1.0
 Author: PCC
 */
 
@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('PCC_WOOOTEC_VERSION', '1.0.0');
+define('PCC_WOOOTEC_VERSION', '1.0');
 define('PCC_WOOOTEC_PATH', plugin_dir_path(__FILE__));
 define('PCC_WOOOTEC_URL', plugin_dir_url(__FILE__));
 
