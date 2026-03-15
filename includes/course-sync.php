@@ -61,6 +61,52 @@ function pcc_run_course_sync(){
 }
 
 
+/*
+----------------------------------------------------
+CATEGORÍA WC PARA CURSOS (autocreación)
+----------------------------------------------------
+*/
+
+function pcc_get_or_create_wc_course_category_id() {
+    if (!function_exists('taxonomy_exists') || !taxonomy_exists('product_cat')) {
+        return 0;
+    }
+
+    $category_id = (int) get_option('pcc_wc_course_category', 0);
+    if ($category_id > 0) {
+        $term = get_term($category_id, 'product_cat');
+        if ($term && !is_wp_error($term)) {
+            return $category_id;
+        }
+    }
+
+    $name = (string) apply_filters('pcc_default_course_category_name', 'Cursos Moodle');
+    $name = $name !== '' ? $name : 'Cursos Moodle';
+
+    $slug = sanitize_title($name);
+    $existing = get_term_by('slug', $slug, 'product_cat');
+    if ($existing && !is_wp_error($existing)) {
+        update_option('pcc_wc_course_category', (int) $existing->term_id);
+        return (int) $existing->term_id;
+    }
+
+    $created = wp_insert_term($name, 'product_cat', array('slug' => $slug));
+    if (is_wp_error($created)) {
+        if (function_exists('pcc_log')) {
+            pcc_log('No se pudo crear categoría de cursos', array('error' => $created->get_error_message()));
+        }
+        return 0;
+    }
+
+    $new_id = isset($created['term_id']) ? (int) $created['term_id'] : 0;
+    if ($new_id > 0) {
+        update_option('pcc_wc_course_category', $new_id);
+    }
+
+    return $new_id;
+}
+
+
 
 /*
 ----------------------------------------------------
@@ -91,7 +137,7 @@ function pcc_create_course_product($course){
 
     $product->set_regular_price('49000');
 
-    $category_id = (int) get_option('pcc_wc_course_category', 0);
+    $category_id = pcc_get_or_create_wc_course_category_id();
     if ($category_id > 0) {
         $product->set_category_ids(array($category_id));
     }
@@ -128,7 +174,7 @@ function pcc_update_course_product($product_id,$course){
         $product->set_description($course->summary);
     }
 
-    $category_id = (int) get_option('pcc_wc_course_category', 0);
+    $category_id = pcc_get_or_create_wc_course_category_id();
     if ($category_id > 0) {
         $product->set_category_ids(array($category_id));
     }

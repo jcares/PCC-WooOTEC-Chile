@@ -125,7 +125,7 @@ function pcc_settings_page() {
                     <th scope="row"><label for="pcc_wc_course_category">Categoría WooCommerce</label></th>
                     <td>
                         <input name="pcc_wc_course_category" id="pcc_wc_course_category" type="number" class="small-text" value="<?php echo esc_attr((string) $category); ?>" min="0" step="1">
-                        <p class="description">ID de categoría para asignar a productos de cursos (0 = no asignar).</p>
+                        <p class="description">ID de categoría para asignar a productos de cursos. Si es 0, se creará automáticamente “Cursos Moodle” en la primera sincronización.</p>
                     </td>
                 </tr>
 
@@ -162,4 +162,3 @@ function pcc_settings_page() {
 
     <?php
 }
-
