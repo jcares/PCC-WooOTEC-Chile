@@ -1,5 +1,6 @@
 .pcc-admin-wrap {
-    max-width: 1100px;
+    max-width: 1180px;
+    margin-right: 20px;
 }
 
 .pcc-brand-bar {
@@ -19,13 +20,30 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    min-width: 0;
+}
+
+.pcc-brand-bar__logo-wrap {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid #dbeafe;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    overflow: hidden;
 }
 
 .pcc-brand-bar__logo {
-    width: 72px;
+    width: 100%;
+    max-width: 48px;
+    max-height: 48px;
     height: auto;
     display: block;
-    border-radius: 12px;
+    object-fit: contain;
 }
 
 .pcc-brand-bar__subtitle {
@@ -54,10 +72,10 @@
 .pcc-card {
     background: #fff;
     border: 1px solid #dcdcde;
-    border-radius: 10px;
-    padding: 20px;
+    border-radius: 16px;
+    padding: 24px;
     margin: 20px 0;
-    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.05);
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.07);
 }
 
 .pcc-dashboard-shell,
@@ -76,35 +94,104 @@
 
 .pcc-tabs {
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    border-bottom: 1px solid #dcdcde;
-    padding-bottom: 12px;
-    margin-bottom: 20px;
+    gap: 10px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 6px;
+    margin-bottom: 22px;
+    border: 1px solid #d7dee7;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.pcc-tabs-wrap {
+    margin-bottom: 4px;
 }
 
 .pcc-tab {
-    border: 1px solid #cbd5e1;
-    background: #f8fafc;
-    color: #0f172a;
-    border-radius: 999px;
-    padding: 10px 14px;
+    appearance: none;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #334155;
+    border-radius: 10px;
+    padding: 11px 16px;
     cursor: pointer;
     font-weight: 600;
+    white-space: nowrap;
+    line-height: 1.2;
+    transition: background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
 
 .pcc-tab.is-active {
-    background: #0d6efd;
-    border-color: #0d6efd;
-    color: #fff;
+    background: #fff;
+    border-color: #b6c6db;
+    color: #0d6efd;
+    box-shadow: 0 6px 18px rgba(13, 110, 253, 0.14);
+}
+
+.pcc-tab:hover,
+.pcc-tab:focus-visible {
+    background: rgba(255, 255, 255, 0.75);
+    color: #0d6efd;
+    outline: none;
 }
 
 .pcc-tab-panel {
     display: none;
+    border: 1px solid #dbe2ea;
+    border-radius: 16px;
+    padding: 24px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
 }
 
 .pcc-tab-panel.is-active {
     display: block;
+}
+
+.pcc-tab-panel > h3 {
+    margin-top: 0;
+    margin-bottom: 4px;
+    font-size: 20px;
+}
+
+.pcc-tab-panel .description {
+    margin-top: 0;
+    margin-bottom: 18px;
+    color: #64748b;
+}
+
+.pcc-settings-form .form-table th {
+    width: 240px;
+    padding-top: 18px;
+    color: #0f172a;
+}
+
+.pcc-settings-form .form-table td {
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+.pcc-settings-form input[type="text"],
+.pcc-settings-form input[type="url"],
+.pcc-settings-form input[type="password"],
+.pcc-settings-form input[type="email"],
+.pcc-settings-form input[type="number"],
+.pcc-settings-form textarea {
+    border-color: #cbd5e1;
+    border-radius: 10px;
+    padding: 8px 12px;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.pcc-settings-form input[type="text"]:focus,
+.pcc-settings-form input[type="url"]:focus,
+.pcc-settings-form input[type="password"]:focus,
+.pcc-settings-form input[type="email"]:focus,
+.pcc-settings-form input[type="number"]:focus,
+.pcc-settings-form textarea:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 1px #86b7fe;
 }
 
 .pcc-badge {
@@ -235,6 +322,7 @@
 
 .pcc-image-preview {
     max-width: 180px;
+    width: 100%;
     border-radius: 8px;
     border: 1px solid #dcdcde;
 }
@@ -304,5 +392,17 @@
 
     .pcc-brand-bar__meta {
         text-align: left;
+    }
+
+    .pcc-settings-form .form-table th,
+    .pcc-settings-form .form-table td {
+        display: block;
+        width: 100%;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .pcc-tab-panel {
+        padding: 18px;
     }
 }

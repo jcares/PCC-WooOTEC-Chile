@@ -13,7 +13,9 @@ $brand_logo_url = PCC_WOOOTEC_PRO_URL . 'assets/images/logo-pccurico.png';
 <div class="wrap pcc-admin-wrap">
     <div class="pcc-brand-bar">
         <div class="pcc-brand-bar__main">
-            <img class="pcc-brand-bar__logo" src="<?php echo esc_url($brand_logo_url); ?>" alt="PCCurico">
+            <span class="pcc-brand-bar__logo-wrap">
+                <img class="pcc-brand-bar__logo" src="<?php echo esc_url($brand_logo_url); ?>" alt="PCCurico">
+            </span>
             <div>
                 <h1>PCC WooOTEC Chile PRO</h1>
                 <p class="pcc-brand-bar__subtitle">Plataforma comercial Moodle + WooCommerce para OTEC.</p>
@@ -39,16 +41,18 @@ $brand_logo_url = PCC_WOOOTEC_PRO_URL . 'assets/images/logo-pccurico.png';
                 </div>
             </div>
 
-            <div class="pcc-tabs" role="tablist">
-                <button type="button" class="pcc-tab is-active" data-tab="moodle">Configuracion Moodle</button>
-                <button type="button" class="pcc-tab" data-tab="defaults">Configuracion por defecto</button>
-                <button type="button" class="pcc-tab" data-tab="sso">SSO</button>
-                <button type="button" class="pcc-tab" data-tab="emails">Correos</button>
-                <button type="button" class="pcc-tab" data-tab="logs">Logs</button>
-                <button type="button" class="pcc-tab" data-tab="updates">Actualizaciones</button>
+            <div class="pcc-tabs-wrap">
+                <div class="pcc-tabs" role="tablist" aria-label="Secciones de configuracion">
+                    <button type="button" class="pcc-tab is-active" id="pcc-tab-moodle" data-tab="moodle" role="tab" aria-selected="true" aria-controls="pcc-panel-moodle">Configuracion Moodle</button>
+                    <button type="button" class="pcc-tab" id="pcc-tab-defaults" data-tab="defaults" role="tab" aria-selected="false" aria-controls="pcc-panel-defaults">Configuracion por defecto</button>
+                    <button type="button" class="pcc-tab" id="pcc-tab-sso" data-tab="sso" role="tab" aria-selected="false" aria-controls="pcc-panel-sso">SSO</button>
+                    <button type="button" class="pcc-tab" id="pcc-tab-emails" data-tab="emails" role="tab" aria-selected="false" aria-controls="pcc-panel-emails">Correos</button>
+                    <button type="button" class="pcc-tab" id="pcc-tab-logs" data-tab="logs" role="tab" aria-selected="false" aria-controls="pcc-panel-logs">Logs</button>
+                    <button type="button" class="pcc-tab" id="pcc-tab-updates" data-tab="updates" role="tab" aria-selected="false" aria-controls="pcc-panel-updates">Actualizaciones</button>
+                </div>
             </div>
 
-            <section class="pcc-tab-panel is-active" data-panel="moodle">
+            <section class="pcc-tab-panel is-active" id="pcc-panel-moodle" data-panel="moodle" role="tabpanel" aria-labelledby="pcc-tab-moodle">
                 <h3>Configuracion Moodle</h3>
                 <p class="description">Configura la conexion principal con tu LMS Moodle.</p>
             <table class="form-table" role="presentation">
@@ -67,7 +71,7 @@ $brand_logo_url = PCC_WOOOTEC_PRO_URL . 'assets/images/logo-pccurico.png';
             </table>
             </section>
 
-            <section class="pcc-tab-panel" data-panel="defaults">
+            <section class="pcc-tab-panel" id="pcc-panel-defaults" data-panel="defaults" role="tabpanel" aria-labelledby="pcc-tab-defaults">
                 <h3>Configuracion por defecto</h3>
                 <p class="description">Valores base cuando Moodle no entregue algun dato.</p>
             <table class="form-table" role="presentation">
@@ -96,7 +100,7 @@ $brand_logo_url = PCC_WOOOTEC_PRO_URL . 'assets/images/logo-pccurico.png';
             </table>
             </section>
 
-            <section class="pcc-tab-panel" data-panel="sso">
+            <section class="pcc-tab-panel" id="pcc-panel-sso" data-panel="sso" role="tabpanel" aria-labelledby="pcc-tab-sso">
                 <h3>SSO</h3>
                 <p class="description">Activa el acceso directo a Moodle por usuario y curso.</p>
             <table class="form-table" role="presentation">
@@ -115,7 +119,7 @@ $brand_logo_url = PCC_WOOOTEC_PRO_URL . 'assets/images/logo-pccurico.png';
             </table>
             </section>
 
-            <section class="pcc-tab-panel" data-panel="emails">
+            <section class="pcc-tab-panel" id="pcc-panel-emails" data-panel="emails" role="tabpanel" aria-labelledby="pcc-tab-emails">
                 <h3>Correos</h3>
                 <p class="description">Configura el envio automatico de accesos y prueba la plantilla.</p>
                 <table class="form-table" role="presentation">
@@ -151,7 +155,7 @@ $brand_logo_url = PCC_WOOOTEC_PRO_URL . 'assets/images/logo-pccurico.png';
                 <div class="pcc-email-preview" data-email-preview-box></div>
             </section>
 
-            <section class="pcc-tab-panel" data-panel="logs">
+            <section class="pcc-tab-panel" id="pcc-panel-logs" data-panel="logs" role="tabpanel" aria-labelledby="pcc-tab-logs">
                 <h3>Logs</h3>
                 <p class="description">Visualizacion rapida de los ultimos eventos de sincronizacion y errores.</p>
                 <div class="pcc-log-grid">
@@ -172,7 +176,7 @@ $brand_logo_url = PCC_WOOOTEC_PRO_URL . 'assets/images/logo-pccurico.png';
                 </table>
             </section>
 
-            <section class="pcc-tab-panel" data-panel="updates">
+            <section class="pcc-tab-panel" id="pcc-panel-updates" data-panel="updates" role="tabpanel" aria-labelledby="pcc-tab-updates">
                 <h3>Actualizaciones</h3>
                 <div class="pcc-update-callout <?php echo !empty($update_available) ? 'has-update' : ''; ?>">
                     <p><strong>Version instalada:</strong> <?php echo esc_html(PCC_WOOOTEC_PRO_VERSION); ?></p>

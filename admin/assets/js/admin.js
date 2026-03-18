@@ -4,14 +4,29 @@
     let frame;
     const syncApp = $('[data-sync-app]');
     const emailFeedback = $('[data-email-feedback]');
+    const tabs = $('.pcc-tab');
+
+    function setActiveTab(tab) {
+        const target = tab.data('tab');
+        if (!target) {
+            return;
+        }
+
+        tabs.removeClass('is-active').attr('aria-selected', 'false');
+        $('.pcc-tab-panel').removeClass('is-active').attr('hidden', true);
+
+        tab.addClass('is-active').attr('aria-selected', 'true');
+        $('.pcc-tab-panel[data-panel="' + target + '"]').addClass('is-active').attr('hidden', false);
+    }
 
     $(document).on('click', '.pcc-tab', function () {
-        const tab = $(this).data('tab');
-        $('.pcc-tab').removeClass('is-active');
-        $('.pcc-tab-panel').removeClass('is-active');
-        $(this).addClass('is-active');
-        $('.pcc-tab-panel[data-panel="' + tab + '"]').addClass('is-active');
+        setActiveTab($(this));
     });
+
+    if (tabs.length) {
+        const currentTab = tabs.filter('.is-active').first();
+        setActiveTab(currentTab.length ? currentTab : tabs.first());
+    }
 
     function setEmailFeedback(message, state) {
         if (!emailFeedback.length) {
