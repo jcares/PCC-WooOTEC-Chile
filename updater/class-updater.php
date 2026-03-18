@@ -22,7 +22,6 @@ final class PCC_WooOTEC_Pro_Updater {
         add_filter('pre_set_site_transient_update_plugins', array($this, 'inject_update'));
         add_filter('plugins_api', array($this, 'plugins_api'), 10, 3);
         add_filter('auto_update_plugin', array($this, 'handle_auto_update'), 10, 2);
-        add_action('admin_notices', array($this, 'render_notice'));
     }
 
     public function inject_update(mixed $transient): mixed {
@@ -77,17 +76,13 @@ final class PCC_WooOTEC_Pro_Updater {
         return PCC_WooOTEC_Pro_Core::instance()->get_option('auto_update', 'no') === 'yes';
     }
 
-    public function render_notice(): void {
-        if (!current_user_can('update_plugins')) {
-            return;
-        }
+    public function get_release_data(): array|false {
+        return $this->get_release();
+    }
 
+    public function has_update_available(): bool {
         $release = $this->get_release();
-        if (!$release || version_compare((string) $release['version'], PCC_WOOOTEC_PRO_VERSION, '<=')) {
-            return;
-        }
-
-        echo '<div class="notice notice-info"><p>Hay una nueva version de PCC-WooOTEC-Chile PRO disponible: ' . esc_html((string) $release['version']) . '.</p></div>';
+        return is_array($release) && !empty($release['version']) && version_compare((string) $release['version'], PCC_WOOOTEC_PRO_VERSION, '>');
     }
 
     private function get_release(): array|false {
@@ -108,6 +103,7 @@ final class PCC_WooOTEC_Pro_Updater {
     private function fetch_release(): array|false {
         $release_url = trim((string) PCC_WooOTEC_Pro_Core::instance()->get_option('github_release_url', ''));
         if ($release_url !== '') {
+            $release_url = $this->normalize_release_url($release_url);
             $release = $this->request_json($release_url);
             if ($release) {
                 return $release;
@@ -120,6 +116,16 @@ final class PCC_WooOTEC_Pro_Updater {
         }
 
         return $this->request_json('https://api.github.com/repos/' . $repo . '/releases/latest');
+    }
+
+    private function normalize_release_url(string $url): string {
+        $url = trim($url);
+        if (str_contains($url, 'github.com/') && str_contains($url, '/blob/')) {
+            $url = str_replace('https://github.com/', 'https://raw.githubusercontent.com/', $url);
+            $url = str_replace('/blob/', '/', $url);
+        }
+
+        return $url;
     }
 
     private function request_json(string $url): array|false {

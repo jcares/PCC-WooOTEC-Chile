@@ -21,6 +21,7 @@ final class PCC_WooOTEC_Pro_Frontend {
     public function boot(): void {
         add_shortcode('pcc_mis_cursos', array($this, 'render_my_courses_shortcode'));
         add_action('wp_enqueue_scripts', array($this, 'enqueue_assets'));
+        add_filter('woocommerce_my_account_my_orders_actions', array($this, 'add_my_account_access_action'), 10, 2);
     }
 
     public function enqueue_assets(): void {
@@ -78,5 +79,17 @@ final class PCC_WooOTEC_Pro_Frontend {
         }
 
         return (string) ob_get_clean();
+    }
+
+    public function add_my_account_access_action(array $actions, WC_Order $order): array {
+        $url = (string) $order->get_meta('_moodle_access_url');
+        if ($url !== '') {
+            $actions['pcc_access_course'] = array(
+                'url'  => esc_url($url),
+                'name' => 'Acceder al curso',
+            );
+        }
+
+        return $actions;
     }
 }

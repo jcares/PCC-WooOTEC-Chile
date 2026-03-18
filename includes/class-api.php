@@ -155,18 +155,23 @@ final class PCC_WooOTEC_Pro_API {
         return 0;
     }
 
-    public function create_user(WP_User $user): array|WP_Error {
+    public function create_user($user): array|WP_Error {
+        $payload = $this->normalize_user_payload($user);
+        if (!$payload) {
+            return new WP_Error('pcc_invalid_user_payload', 'Datos insuficientes para crear usuario Moodle.');
+        }
+
         $password = wp_generate_password(14, true, true);
         $response = $this->request(
             'core_user_create_users',
             array(
                 'users' => array(
                     array(
-                        'username'  => (string) $user->user_email,
+                        'username'  => (string) $payload['email'],
                         'password'  => $password,
-                        'firstname' => (string) ($user->first_name !== '' ? $user->first_name : $user->display_name),
-                        'lastname'  => (string) ($user->last_name !== '' ? $user->last_name : 'Alumno'),
-                        'email'     => (string) $user->user_email,
+                        'firstname' => (string) $payload['firstname'],
+                        'lastname'  => (string) $payload['lastname'],
+                        'email'     => (string) $payload['email'],
                     ),
                 ),
             )
@@ -186,8 +191,13 @@ final class PCC_WooOTEC_Pro_API {
         );
     }
 
-    public function get_or_create_user(WP_User $user): array|WP_Error {
-        $existing_id = $this->find_user_by_email((string) $user->user_email);
+    public function get_or_create_user($user): array|WP_Error {
+        $payload = $this->normalize_user_payload($user);
+        if (!$payload) {
+            return new WP_Error('pcc_invalid_user_payload', 'Datos insuficientes para obtener o crear usuario Moodle.');
+        }
+
+        $existing_id = $this->find_user_by_email((string) $payload['email']);
         if ($existing_id > 0) {
             return array(
                 'id'       => $existing_id,
@@ -196,7 +206,7 @@ final class PCC_WooOTEC_Pro_API {
             );
         }
 
-        $created = $this->create_user($user);
+        $created = $this->create_user($payload);
         if (is_wp_error($created)) {
             return $created;
         }
@@ -220,5 +230,38 @@ final class PCC_WooOTEC_Pro_API {
         );
 
         return !is_wp_error($response);
+    }
+
+    private function normalize_user_payload($user): array|false {
+        if ($user instanceof WP_User) {
+            $email = sanitize_email((string) $user->user_email);
+            if ($email === '') {
+                return false;
+            }
+
+            return array(
+                'email'     => $email,
+                'firstname' => (string) ($user->first_name !== '' ? $user->first_name : $user->display_name),
+                'lastname'  => (string) ($user->last_name !== '' ? $user->last_name : 'Alumno'),
+            );
+        }
+
+        if (is_array($user)) {
+            $email = sanitize_email((string) ($user['email'] ?? ''));
+            if ($email === '') {
+                return false;
+            }
+
+            $firstname = sanitize_text_field((string) ($user['firstname'] ?? ''));
+            $lastname = sanitize_text_field((string) ($user['lastname'] ?? ''));
+
+            return array(
+                'email'     => $email,
+                'firstname' => $firstname !== '' ? $firstname : 'Alumno',
+                'lastname'  => $lastname !== '' ? $lastname : 'Alumno',
+            );
+        }
+
+        return false;
     }
 }

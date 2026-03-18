@@ -38,3 +38,20 @@
     text-decoration: none;
     font-weight: 600;
 }
+
+.pcc-access-box {
+    margin: 24px 0;
+    padding: 20px;
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+}
+
+.pcc-access-links {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}

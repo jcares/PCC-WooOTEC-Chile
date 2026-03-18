@@ -67,6 +67,63 @@ final class PCC_WooOTEC_Pro_Sync {
         return $result;
     }
 
+    public function run_stage(string $stage): array {
+        if (!class_exists('WooCommerce')) {
+            return array(
+                'status'  => 'error',
+                'message' => 'WooCommerce no esta activo.',
+            );
+        }
+
+        if ($stage === 'categories') {
+            $categories = PCC_WooOTEC_Pro_API::instance()->get_categories();
+            $result = $this->sync_categories($categories);
+
+            return array(
+                'status'             => 'success',
+                'stage'              => 'categories',
+                'message'            => 'Categorias sincronizadas.',
+                'categories_created' => (int) $result['created'],
+                'categories_updated' => (int) $result['updated'],
+            );
+        }
+
+        if ($stage === 'courses') {
+            $courses = PCC_WooOTEC_Pro_API::instance()->get_courses();
+            if (empty($courses)) {
+                return array(
+                    'status'  => 'error',
+                    'stage'   => 'courses',
+                    'message' => 'No se pudieron obtener cursos desde Moodle.',
+                );
+            }
+
+            $result = $this->sync_courses($courses);
+            $payload = array(
+                'status'           => 'success',
+                'stage'            => 'courses',
+                'message'          => 'Cursos sincronizados.',
+                'products_created' => (int) $result['created'],
+                'products_updated' => (int) $result['updated'],
+            );
+
+            $this->update_last_sync(array_merge(
+                $payload,
+                array(
+                    'categories_created' => (int) (PCC_WooOTEC_Pro_Core::instance()->get_option('last_sync', array())['categories_created'] ?? 0),
+                    'categories_updated' => (int) (PCC_WooOTEC_Pro_Core::instance()->get_option('last_sync', array())['categories_updated'] ?? 0),
+                )
+            ));
+
+            return $payload;
+        }
+
+        return array(
+            'status'  => 'error',
+            'message' => 'Etapa de sincronizacion invalida.',
+        );
+    }
+
     public function sync_categories(array $categories): array {
         $result = array('created' => 0, 'updated' => 0);
         if (!taxonomy_exists('product_cat')) {
