@@ -7,6 +7,8 @@ if (!defined('ABSPATH')) {
 class PCC_WooOTEC_Cron {
     public const CRON_HOOK = 'pcc_woootec_retry_failed_enrollments';
     public const CRON_SCHEDULE = 'pcc_woootec_five_minutes';
+    public const SYNC_HOOK = 'pcc_woootec_hourly_sync';
+    public const SYNC_SCHEDULE = 'pcc_woootec_hourly';
 
     public static function install_table() {
         global $wpdb;
@@ -46,24 +48,34 @@ class PCC_WooOTEC_Cron {
                 'display'  => 'PCC WooOTEC: cada 5 minutos',
             );
         }
+
+        if (!isset($schedules[self::SYNC_SCHEDULE])) {
+            $schedules[self::SYNC_SCHEDULE] = array(
+                'interval' => HOUR_IN_SECONDS,
+                'display'  => 'PCC WooOTEC: cada 1 hora',
+            );
+        }
+
         return $schedules;
     }
 
     public static function ensure_scheduled() {
-        if (!apply_filters('pcc_enable_retry_cron', true)) {
-            return;
+        if (!wp_next_scheduled(self::CRON_HOOK) && apply_filters('pcc_enable_retry_cron', true)) {
+            wp_schedule_event(time() + 120, self::CRON_SCHEDULE, self::CRON_HOOK);
         }
 
-        if (!wp_next_scheduled(self::CRON_HOOK)) {
-            wp_schedule_event(time() + 120, self::CRON_SCHEDULE, self::CRON_HOOK);
+        if (!wp_next_scheduled(self::SYNC_HOOK) && apply_filters('pcc_enable_sync_cron', true)) {
+            wp_schedule_event(time() + 300, self::SYNC_SCHEDULE, self::SYNC_HOOK);
         }
     }
 
     public static function unschedule() {
-        $timestamp = wp_next_scheduled(self::CRON_HOOK);
-        while ($timestamp) {
-            wp_unschedule_event($timestamp, self::CRON_HOOK);
-            $timestamp = wp_next_scheduled(self::CRON_HOOK);
+        foreach (array(self::CRON_HOOK, self::SYNC_HOOK) as $hook) {
+            $timestamp = wp_next_scheduled($hook);
+            while ($timestamp) {
+                wp_unschedule_event($timestamp, $hook);
+                $timestamp = wp_next_scheduled($hook);
+            }
         }
     }
 
@@ -75,24 +87,20 @@ class PCC_WooOTEC_Cron {
         $user_email = sanitize_email((string) $user_email);
 
         if ($order_id <= 0 || $course_id <= 0 || $user_email === '') {
-            if (class_exists('PCC_Logger')) {
-                PCC_Logger::error('enqueue_failed: datos inválidos', array('order_id' => $order_id, 'course_id' => $course_id));
-            }
+            PCC_Logger::error('enqueue_failed: datos invalidos', array('order_id' => $order_id, 'course_id' => $course_id));
             return false;
         }
 
         $table = self::table_name();
-
         $existing = $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT id, attempts, status FROM {$table} WHERE order_id = %d AND course_id = %d LIMIT 1",
+                "SELECT id FROM {$table} WHERE order_id = %d AND course_id = %d LIMIT 1",
                 $order_id,
                 $course_id
             )
         );
 
         $now = current_time('mysql');
-
         if ($existing) {
             $wpdb->update(
                 $table,
@@ -120,14 +128,11 @@ class PCC_WooOTEC_Cron {
             array('%d', '%s', '%d', '%d', '%s', '%s')
         );
 
-        if ($wpdb->insert_id) {
-            if (class_exists('PCC_Logger') && $error_message !== '') {
-                PCC_Logger::error('Matrícula en cola (fallida)', array('order_id' => $order_id, 'course_id' => $course_id, 'error' => $error_message));
-            }
-            return (int) $wpdb->insert_id;
+        if ($wpdb->insert_id && $error_message !== '') {
+            PCC_Logger::error('Matricula en cola', array('order_id' => $order_id, 'course_id' => $course_id, 'error' => $error_message));
         }
 
-        return false;
+        return $wpdb->insert_id ? (int) $wpdb->insert_id : false;
     }
 
     public static function get_queue_counts() {
@@ -145,7 +150,7 @@ class PCC_WooOTEC_Cron {
         if (is_array($rows)) {
             foreach ($rows as $row) {
                 $status = isset($row->status) ? (string) $row->status : '';
-                if ($status !== '' && array_key_exists($status, $counts)) {
+                if (isset($counts[$status])) {
                     $counts[$status] = (int) $row->c;
                 }
             }
@@ -157,14 +162,7 @@ class PCC_WooOTEC_Cron {
     public static function get_queue_rows($limit = 50, $statuses = array('pending', 'failed', 'abandoned', 'enrolled')) {
         global $wpdb;
 
-        $limit = (int) $limit;
-        if ($limit < 1) {
-            $limit = 1;
-        }
-        if ($limit > 200) {
-            $limit = 200;
-        }
-
+        $limit = max(1, min(200, (int) $limit));
         $statuses = array_values(array_filter(array_map('sanitize_key', (array) $statuses)));
         if (empty($statuses)) {
             $statuses = array('pending', 'failed', 'abandoned', 'enrolled');
@@ -175,10 +173,7 @@ class PCC_WooOTEC_Cron {
 
         return $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT * FROM {$table}
-                 WHERE status IN ({$placeholders})
-                 ORDER BY created_at DESC
-                 LIMIT %d",
+                "SELECT * FROM {$table} WHERE status IN ({$placeholders}) ORDER BY created_at DESC LIMIT %d",
                 array_merge($statuses, array($limit))
             )
         );
@@ -187,14 +182,8 @@ class PCC_WooOTEC_Cron {
     public static function retry_failed_enrollments($return_details = false) {
         global $wpdb;
 
-        $max_attempts = (int) apply_filters('pcc_retry_max_attempts', 6);
-        $batch_size = (int) apply_filters('pcc_retry_batch_size', 10);
-        if ($max_attempts < 1) {
-            $max_attempts = 1;
-        }
-        if ($batch_size < 1) {
-            $batch_size = 1;
-        }
+        $max_attempts = max(1, (int) apply_filters('pcc_retry_max_attempts', 6));
+        $batch_size = max(1, (int) apply_filters('pcc_retry_batch_size', 10));
 
         $table = self::table_name();
         $rows = $wpdb->get_results(
@@ -233,15 +222,13 @@ class PCC_WooOTEC_Cron {
         $course_id = (int) $row->course_id;
         $user_email = (string) $row->user_email;
         $status_before = isset($row->status) ? (string) $row->status : '';
-
         $attempts = (int) $row->attempts + 1;
-        $now = current_time('mysql');
 
         $wpdb->update(
             $table,
             array(
                 'attempts' => $attempts,
-                'last_try' => $now,
+                'last_try' => current_time('mysql'),
                 'status'   => 'pending',
             ),
             array('id' => $id),
@@ -268,10 +255,9 @@ class PCC_WooOTEC_Cron {
 
         $moodle_user_id = (int) get_user_meta($user->ID, 'pcc_moodle_user_id', true);
         if ($moodle_user_id <= 0) {
-            if (function_exists('pcc_moodle_get_or_create_user')) {
-                $moodle_user_id = (int) pcc_moodle_get_or_create_user($user);
-            }
-            if ($moodle_user_id > 0) {
+            $create_info = function_exists('pcc_moodle_get_or_create_user_with_password') ? pcc_moodle_get_or_create_user_with_password($user) : false;
+            if (!empty($create_info['id'])) {
+                $moodle_user_id = (int) $create_info['id'];
                 update_user_meta($user->ID, 'pcc_moodle_user_id', $moodle_user_id);
             }
         }
@@ -283,8 +269,8 @@ class PCC_WooOTEC_Cron {
 
         $ok = function_exists('pcc_moodle_enroll_user') ? pcc_moodle_enroll_user($moodle_user_id, $course_id) : false;
         if (!$ok) {
-            $status_after = self::mark_failed($id, $attempts, $max_attempts, 'Falló matrícula Moodle');
-            return self::result_array($id, $order_id, $course_id, $status_before, $status_after, 'Falló matrícula Moodle');
+            $status_after = self::mark_failed($id, $attempts, $max_attempts, 'Fallo matricula Moodle');
+            return self::result_array($id, $order_id, $course_id, $status_before, $status_after, 'Fallo matricula Moodle');
         }
 
         $wpdb->update(
@@ -299,23 +285,19 @@ class PCC_WooOTEC_Cron {
         if (!is_array($already)) {
             $already = array();
         }
+
         if (!in_array($course_id, $already, true)) {
             $already[] = $course_id;
             $order->update_meta_data('_pcc_moodle_enrolled_courses', array_values(array_unique($already)));
         }
 
-        $order->add_order_note(sprintf('PCC WooOTEC: reintento exitoso de matrícula en curso Moodle #%d.', $course_id));
-
-        $pending = self::count_pending_for_order($order_id, $max_attempts);
-        if ($pending === 0) {
+        if (self::count_pending_for_order($order_id, $max_attempts) === 0) {
             $order->update_meta_data('_pcc_moodle_enrollment_complete', 1);
         }
 
         $order->save();
 
-        if (class_exists('PCC_Logger')) {
-            PCC_Logger::log('Reintento matrícula OK', 'info', array('order_id' => $order_id, 'course_id' => $course_id), true);
-        }
+        PCC_Logger::log('Reintento matricula OK', 'info', array('order_id' => $order_id, 'course_id' => $course_id), true);
 
         return self::result_array($id, $order_id, $course_id, $status_before, 'enrolled', 'OK');
     }
@@ -333,9 +315,7 @@ class PCC_WooOTEC_Cron {
             array('%d')
         );
 
-        if (class_exists('PCC_Logger')) {
-            PCC_Logger::error('Reintento matrícula falló', array('row_id' => (int) $id, 'attempts' => (int) $attempts, 'reason' => (string) $reason));
-        }
+        PCC_Logger::error('Reintento matricula fallo', array('row_id' => (int) $id, 'attempts' => (int) $attempts, 'reason' => (string) $reason));
 
         return $status;
     }
@@ -343,10 +323,9 @@ class PCC_WooOTEC_Cron {
     private static function count_pending_for_order($order_id, $max_attempts) {
         global $wpdb;
 
-        $table = self::table_name();
-        $count = $wpdb->get_var(
+        return (int) $wpdb->get_var(
             $wpdb->prepare(
-                "SELECT COUNT(1) FROM {$table}
+                "SELECT COUNT(1) FROM " . self::table_name() . "
                  WHERE order_id = %d
                    AND status IN ('pending','failed')
                    AND attempts < %d",
@@ -354,18 +333,16 @@ class PCC_WooOTEC_Cron {
                 (int) $max_attempts
             )
         );
-
-        return (int) $count;
     }
 
     private static function result_array($row_id, $order_id, $course_id, $status_before, $status_after, $message) {
         return array(
-            'row_id'       => (int) $row_id,
-            'order_id'     => (int) $order_id,
-            'course_id'    => (int) $course_id,
-            'from'         => (string) $status_before,
-            'to'           => (string) $status_after,
-            'message'      => (string) $message,
+            'row_id'    => (int) $row_id,
+            'order_id'  => (int) $order_id,
+            'course_id' => (int) $course_id,
+            'from'      => (string) $status_before,
+            'to'        => (string) $status_after,
+            'message'   => (string) $message,
         );
     }
 }

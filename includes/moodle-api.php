@@ -156,6 +156,55 @@ function pcc_moodle_get_courses() {
     return is_array($courses) ? $courses : array();
 }
 
+function pcc_moodle_get_categories() {
+    $categories = pcc_moodle_request('core_course_get_categories');
+    return is_array($categories) ? $categories : array();
+}
+
+function pcc_moodle_get_course_teacher($course_id) {
+    static $teacher_cache = array();
+
+    $course_id = (int) $course_id;
+    if ($course_id <= 0) {
+        return '';
+    }
+
+    if (array_key_exists($course_id, $teacher_cache)) {
+        return $teacher_cache[$course_id];
+    }
+
+    $users = pcc_moodle_request(
+        'core_enrol_get_enrolled_users',
+        array('courseid' => $course_id)
+    );
+
+    if (!is_array($users)) {
+        $teacher_cache[$course_id] = '';
+        return '';
+    }
+
+    foreach ($users as $user) {
+        if (!is_object($user) || empty($user->roles) || !is_array($user->roles)) {
+            continue;
+        }
+
+        foreach ($user->roles as $role) {
+            if (!is_object($role) || empty($role->shortname)) {
+                continue;
+            }
+
+            $shortname = strtolower((string) $role->shortname);
+            if (in_array($shortname, array('editingteacher', 'teacher'), true)) {
+                $teacher_cache[$course_id] = !empty($user->fullname) ? (string) $user->fullname : '';
+                return $teacher_cache[$course_id];
+            }
+        }
+    }
+
+    $teacher_cache[$course_id] = '';
+    return '';
+}
+
 /*
 ========================================
 CREAR USUARIO EN MOODLE

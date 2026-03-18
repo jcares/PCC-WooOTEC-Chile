@@ -1,0 +1,7 @@
+{
+  "version": "1.0.0",
+  "download_url": "",
+  "homepage": "",
+  "description": "Integracion Moodle + WooCommerce para vender y matricular cursos online.",
+  "changelog": "Version inicial profesional con sincronizacion, matricula automatica, SSO y soporte de actualizaciones."
+}
