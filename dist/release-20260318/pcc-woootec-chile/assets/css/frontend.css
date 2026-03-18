@@ -1,0 +1,57 @@
+.pcc-my-courses {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.pcc-course-card {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+}
+
+.pcc-course-card__image {
+    display: block;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.pcc-course-card__body {
+    padding: 20px;
+}
+
+.pcc-course-card__body h3 {
+    margin: 0 0 12px;
+    font-size: 1.2rem;
+}
+
+.pcc-course-card__button {
+    display: inline-block;
+    margin-top: 12px;
+    background: #0f766e;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.pcc-access-box {
+    margin: 24px 0;
+    padding: 20px;
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+}
+
+.pcc-access-links {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
