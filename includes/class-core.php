@@ -67,6 +67,7 @@ final class PCC_WooOTEC_Pro_Core {
     private function load_dependencies(): void {
         require_once PCC_WOOOTEC_PRO_PATH . 'includes/class-logger.php';
         require_once PCC_WOOOTEC_PRO_PATH . 'includes/class-api.php';
+        require_once PCC_WOOOTEC_PRO_PATH . 'includes/class-mailer.php';
         require_once PCC_WOOOTEC_PRO_PATH . 'includes/class-sso.php';
         require_once PCC_WOOOTEC_PRO_PATH . 'includes/class-sync.php';
         require_once PCC_WOOOTEC_PRO_PATH . 'includes/class-enroll.php';
@@ -91,6 +92,7 @@ final class PCC_WooOTEC_Pro_Core {
 
         PCC_WooOTEC_Pro_Admin::instance()->boot();
         PCC_WooOTEC_Pro_Frontend::instance()->boot();
+        PCC_WooOTEC_Pro_Mailer::instance();
         PCC_WooOTEC_Pro_Enroll::instance()->boot();
         PCC_WooOTEC_Pro_Cron::boot();
         PCC_WooOTEC_Pro_Updater::instance()->boot();

@@ -72,7 +72,7 @@ final class PCC_WooOTEC_Pro_Enroll {
 
     public function render_email_preview(): string {
         $sample = $this->get_sample_email_data();
-        return $this->render_email_template($sample, true);
+        return PCC_WooOTEC_Pro_Mailer::instance()->render_template($sample, true);
     }
 
     public function send_test_email(string $recipient): bool|WP_Error {
@@ -81,9 +81,9 @@ final class PCC_WooOTEC_Pro_Enroll {
             return new WP_Error('pcc_invalid_test_email', 'Debes indicar un correo de prueba valido.');
         }
 
-        $subject = $this->render_email_subject($this->get_sample_email_data());
+        $subject = PCC_WooOTEC_Pro_Mailer::instance()->render_subject($this->get_sample_email_data());
         $body = $this->render_email_preview();
-        $sent = wp_mail($recipient, $subject, $body, array('Content-Type: text/html; charset=UTF-8'));
+        $sent = PCC_WooOTEC_Pro_Mailer::instance()->send($recipient, $subject, $body);
 
         if (!$sent) {
             PCC_WooOTEC_Pro_Logger::error('Fallo envio de correo de prueba', array('recipient' => $recipient));
@@ -311,15 +311,9 @@ final class PCC_WooOTEC_Pro_Enroll {
 
         $urls = is_array($urls) ? $urls : (array) $order->get_meta('_pcc_moodle_access_urls');
         $data = $this->build_email_data($order, $learner, $password, $urls);
-        $subject = $this->render_email_subject($data);
-        $body = $this->render_email_template($data, false);
-
-        $sent = wp_mail(
-            (string) $learner['email'],
-            $subject,
-            $body,
-            array('Content-Type: text/html; charset=UTF-8')
-        );
+        $subject = PCC_WooOTEC_Pro_Mailer::instance()->render_subject($data);
+        $body = PCC_WooOTEC_Pro_Mailer::instance()->render_template($data, false);
+        $sent = PCC_WooOTEC_Pro_Mailer::instance()->send((string) $learner['email'], $subject, $body);
 
         if ($sent) {
             $order->update_meta_data('_pcc_access_email_sent', 1);
@@ -352,35 +346,6 @@ final class PCC_WooOTEC_Pro_Enroll {
             'cursos'      => implode('<br>', array_map('esc_html', $course_names)),
             'sitio'       => wp_specialchars_decode(get_bloginfo('name'), ENT_QUOTES),
         );
-    }
-
-    private function render_email_subject(array $data): string {
-        $subject = (string) PCC_WooOTEC_Pro_Core::instance()->get_option('email_subject', 'Acceso a tus cursos en {{sitio}}');
-        return wp_strip_all_tags($this->replace_template_variables($subject, $data));
-    }
-
-    private function render_email_template(array $data, bool $preview): string {
-        $template = (string) PCC_WooOTEC_Pro_Core::instance()->get_option('email_template', '');
-        $html = $this->replace_template_variables($template, $data);
-
-        if ($preview) {
-            return '<div class="pcc-email-preview-html">' . wp_kses_post($html) . '</div>';
-        }
-
-        return wp_kses_post($html);
-    }
-
-    private function replace_template_variables(string $template, array $data): string {
-        $replacements = array(
-            '{{nombre}}'     => (string) ($data['nombre'] ?? ''),
-            '{{email}}'      => (string) ($data['email'] ?? ''),
-            '{{password}}'   => (string) ($data['password'] ?? ''),
-            '{{url_acceso}}' => (string) ($data['url_acceso'] ?? ''),
-            '{{cursos}}'     => (string) ($data['cursos'] ?? ''),
-            '{{sitio}}'      => (string) ($data['sitio'] ?? ''),
-        );
-
-        return strtr($template, $replacements);
     }
 
     private function get_sample_email_data(): array {

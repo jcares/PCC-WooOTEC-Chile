@@ -18,6 +18,12 @@
         tab.addClass('is-active').attr('aria-selected', 'true');
         $('.pcc-tab-panel[data-panel="' + target + '"]').addClass('is-active').attr('hidden', false);
         tab[0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+
+        if (window.history && window.history.replaceState) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', target);
+            window.history.replaceState({}, '', url.toString());
+        }
     }
 
     $(document).on('click', '.pcc-tab', function () {
@@ -54,7 +60,9 @@
     });
 
     if (tabs.length) {
-        const currentTab = tabs.filter('.is-active').first();
+        const defaultTab = pccWoootecAdmin && pccWoootecAdmin.defaultTab ? pccWoootecAdmin.defaultTab : '';
+        const requestedTab = defaultTab ? $('.pcc-tab[data-tab="' + defaultTab + '"]').first() : $();
+        const currentTab = requestedTab.length ? requestedTab : tabs.filter('.is-active').first();
         setActiveTab(currentTab.length ? currentTab : tabs.first());
     }
 

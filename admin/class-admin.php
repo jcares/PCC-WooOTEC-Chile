@@ -60,8 +60,10 @@ final class PCC_WooOTEC_Pro_Admin {
             'sso_base_url'         => 'esc_url_raw',
             'github_repo'          => 'sanitize_text_field',
             'github_release_url'   => 'esc_url_raw',
+            'email_from_address'   => 'sanitize_email',
+            'email_from_name'      => 'sanitize_text_field',
             'email_subject'        => 'sanitize_text_field',
-            'email_template'       => 'wp_kses_post',
+            'email_template'       => array($this, 'sanitize_email_template'),
             'email_test_recipient' => 'sanitize_email',
             'retry_limit'          => 'absint',
         );
@@ -95,6 +97,14 @@ final class PCC_WooOTEC_Pro_Admin {
         return !empty($value) && $value !== 'no' ? 'yes' : 'no';
     }
 
+    public function sanitize_email_template(mixed $value): string {
+        if (!is_string($value)) {
+            return '';
+        }
+
+        return wp_kses($value, PCC_WooOTEC_Pro_Mailer::instance()->get_email_allowed_html());
+    }
+
     public function enqueue_assets(string $hook): void {
         if (strpos($hook, 'pcc-woootec-chile') === false) {
             return;
@@ -110,6 +120,7 @@ final class PCC_WooOTEC_Pro_Admin {
                 'ajaxUrl' => admin_url('admin-ajax.php'),
                 'nonce'   => wp_create_nonce('pcc_woootec_sync_stage'),
                 'emailNonce' => wp_create_nonce('pcc_woootec_email_tools'),
+                'defaultTab' => $this->get_default_tab(),
             )
         );
     }
@@ -124,7 +135,8 @@ final class PCC_WooOTEC_Pro_Admin {
         $result = PCC_WooOTEC_Pro_Sync::instance()->run(true);
         $redirect = add_query_arg(
             array(
-                'page'   => 'pcc-woootec-chile-sync',
+                'page'   => 'pcc-woootec-chile',
+                'tab'    => 'sync',
                 'status' => $result['status'],
             ),
             admin_url('admin.php')
@@ -144,28 +156,37 @@ final class PCC_WooOTEC_Pro_Admin {
             'error_log'       => PCC_WooOTEC_Pro_Logger::read_tail(PCC_WooOTEC_Pro_Logger::ERROR_LOG),
             'release'         => $updater->get_release_data(),
             'update_available'=> $updater->has_update_available(),
+            'active_tab'      => $this->get_default_tab(),
+            'status'          => sanitize_key((string) ($_GET['status'] ?? '')),
         );
 
         $this->render_view('settings-page.php', $data);
     }
 
     public function render_sync_page(): void {
-        $this->render_view(
-            'sync-page.php',
-            array(
-                'last_sync' => PCC_WooOTEC_Pro_Core::instance()->get_option('last_sync', array()),
+        wp_safe_redirect(
+            add_query_arg(
+                array(
+                    'page' => 'pcc-woootec-chile',
+                    'tab'  => 'sync',
+                ),
+                admin_url('admin.php')
             )
         );
+        exit;
     }
 
     public function render_logs_page(): void {
-        $this->render_view(
-            'logs-page.php',
-            array(
-                'sync_log'  => PCC_WooOTEC_Pro_Logger::read_tail(PCC_WooOTEC_Pro_Logger::SYNC_LOG),
-                'error_log' => PCC_WooOTEC_Pro_Logger::read_tail(PCC_WooOTEC_Pro_Logger::ERROR_LOG),
+        wp_safe_redirect(
+            add_query_arg(
+                array(
+                    'page' => 'pcc-woootec-chile',
+                    'tab'  => 'sync',
+                ),
+                admin_url('admin.php')
             )
         );
+        exit;
     }
 
     private function render_view(string $view, array $data = array()): void {
@@ -231,5 +252,11 @@ final class PCC_WooOTEC_Pro_Admin {
         }
 
         wp_send_json_success(array('message' => 'Correo de prueba enviado.'));
+    }
+
+    private function get_default_tab(): string {
+        $allowed_tabs = array('general', 'sync', 'sso', 'emails', 'licenses');
+        $tab = sanitize_key((string) ($_GET['tab'] ?? 'general'));
+        return in_array($tab, $allowed_tabs, true) ? $tab : 'general';
     }
 }

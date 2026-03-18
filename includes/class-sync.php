@@ -5,6 +5,10 @@ if (!defined('ABSPATH')) {
 }
 
 final class PCC_WooOTEC_Pro_Sync {
+    private const ATTRIBUTE_TEACHER = 'Profesor';
+    private const ATTRIBUTE_START_DATE = 'Fecha de inicio';
+    private const ATTRIBUTE_END_DATE = 'Fecha de termino';
+
     private static ?PCC_WooOTEC_Pro_Sync $instance = null;
 
     public static function instance(): PCC_WooOTEC_Pro_Sync {
@@ -317,11 +321,12 @@ final class PCC_WooOTEC_Pro_Sync {
 
     private function create_product(object $course): int {
         $product = new WC_Product_Simple();
-        $this->hydrate_product($product, $course);
+        $course_data = $this->build_course_sync_data($course);
+        $this->hydrate_product($product, $course, $course_data);
 
         $product_id = $product->save();
         if ($product_id > 0) {
-            $this->update_product_meta($product_id, $course);
+            $this->update_product_meta($product_id, $course, $course_data);
             $this->assign_product_image($product_id, $course);
         }
 
@@ -334,23 +339,25 @@ final class PCC_WooOTEC_Pro_Sync {
             return;
         }
 
-        $this->hydrate_product($product, $course);
+        $course_data = $this->build_course_sync_data($course);
+        $this->hydrate_product($product, $course, $course_data);
         $product->save();
-        $this->update_product_meta($product_id, $course);
+        $this->update_product_meta($product_id, $course, $course_data);
         $this->assign_product_image($product_id, $course);
     }
 
-    private function hydrate_product(WC_Product $product, object $course): void {
+    private function hydrate_product(WC_Product $product, object $course, array $course_data): void {
         $product->set_name((string) ($course->fullname ?? 'Curso Moodle'));
         $product->set_slug('moodle-course-' . (int) $course->id);
-        $product->set_description($this->get_course_description($course));
-        $product->set_short_description(wp_trim_words(wp_strip_all_tags($this->get_course_description($course)), 30));
+        $product->set_description($course_data['description']);
+        $product->set_short_description($course_data['short_description']);
         $product->set_status(!empty($course->visible) ? 'publish' : 'draft');
         $product->set_virtual(true);
         $product->set_downloadable(false);
         $product->set_catalog_visibility('visible');
         $product->set_sku('MOODLE-' . (int) $course->id);
         $product->set_regular_price((string) PCC_WooOTEC_Pro_Core::instance()->get_option('default_price', '49000'));
+        $product->set_attributes($this->build_product_attributes($product, $course_data));
 
         $category_ids = $this->resolve_category_ids((int) ($course->categoryid ?? 0));
         if (!empty($category_ids)) {
@@ -376,19 +383,85 @@ final class PCC_WooOTEC_Pro_Sync {
         return $term ? array((int) $term->term_id) : array();
     }
 
-    private function update_product_meta(int $product_id, object $course): void {
+    private function update_product_meta(int $product_id, object $course, array $course_data): void {
+        update_post_meta($product_id, '_moodle_id', (int) $course->id);
+        update_post_meta($product_id, 'moodle_course_id', (int) $course->id);
+        update_post_meta($product_id, '_start_date', (int) $course_data['start_timestamp']);
+        update_post_meta($product_id, '_end_date', (int) $course_data['end_timestamp']);
+        update_post_meta($product_id, '_instructor', sanitize_text_field($course_data['teacher']));
+        update_post_meta($product_id, '_moodle_course_details', wp_slash($course_data['description']));
+        update_post_meta($product_id, '_moodle_course_details_plain', sanitize_textarea_field($course_data['details_plain']));
+        update_post_meta($product_id, '_pcc_synced', 1);
+        update_post_meta($product_id, '_moodle_category_id', isset($course->categoryid) ? (int) $course->categoryid : 0);
+    }
+
+    private function build_course_sync_data(object $course): array {
+        $description = $this->get_course_description($course);
+        $details_plain = trim(preg_replace('/\s+/', ' ', wp_strip_all_tags($description)));
         $teacher_names = PCC_WooOTEC_Pro_API::instance()->get_course_teachers((int) $course->id);
         $teacher = !empty($teacher_names)
             ? implode(', ', $teacher_names)
             : (string) PCC_WooOTEC_Pro_Core::instance()->get_option('default_instructor', 'No asignado');
+        $start_timestamp = isset($course->startdate) ? (int) $course->startdate : 0;
+        $end_timestamp = isset($course->enddate) ? (int) $course->enddate : 0;
 
-        update_post_meta($product_id, '_moodle_id', (int) $course->id);
-        update_post_meta($product_id, 'moodle_course_id', (int) $course->id);
-        update_post_meta($product_id, '_start_date', isset($course->startdate) ? (int) $course->startdate : 0);
-        update_post_meta($product_id, '_end_date', isset($course->enddate) ? (int) $course->enddate : 0);
-        update_post_meta($product_id, '_instructor', sanitize_text_field($teacher));
-        update_post_meta($product_id, '_pcc_synced', 1);
-        update_post_meta($product_id, '_moodle_category_id', isset($course->categoryid) ? (int) $course->categoryid : 0);
+        return array(
+            'description'       => $description,
+            'short_description' => wp_trim_words($details_plain, 30),
+            'details_plain'     => $details_plain,
+            'teacher'           => sanitize_text_field($teacher),
+            'start_timestamp'   => $start_timestamp,
+            'end_timestamp'     => $end_timestamp,
+            'start_label'       => $start_timestamp > 0 ? wp_date(get_option('date_format') ?: 'd/m/Y', $start_timestamp) : '',
+            'end_label'         => $end_timestamp > 0 ? wp_date(get_option('date_format') ?: 'd/m/Y', $end_timestamp) : '',
+        );
+    }
+
+    private function build_product_attributes(WC_Product $product, array $course_data): array {
+        $managed_names = array(
+            self::ATTRIBUTE_TEACHER,
+            self::ATTRIBUTE_START_DATE,
+            self::ATTRIBUTE_END_DATE,
+        );
+
+        $attributes = array();
+        foreach ($product->get_attributes() as $key => $attribute) {
+            if (!$attribute instanceof WC_Product_Attribute) {
+                continue;
+            }
+
+            $attribute_name = $attribute->is_taxonomy() ? wc_attribute_label($attribute->get_name()) : $attribute->get_name();
+            if (in_array($attribute_name, $managed_names, true)) {
+                continue;
+            }
+
+            $attributes[$key] = $attribute;
+        }
+
+        $position = count($attributes);
+        $mapped_attributes = array(
+            self::ATTRIBUTE_TEACHER    => (string) $course_data['teacher'],
+            self::ATTRIBUTE_START_DATE => (string) $course_data['start_label'],
+            self::ATTRIBUTE_END_DATE   => (string) $course_data['end_label'],
+        );
+
+        foreach ($mapped_attributes as $label => $value) {
+            if ($value === '') {
+                continue;
+            }
+
+            $attribute = new WC_Product_Attribute();
+            $attribute->set_id(0);
+            $attribute->set_name($label);
+            $attribute->set_options(array($value));
+            $attribute->set_visible(true);
+            $attribute->set_variation(false);
+            $attribute->set_position($position++);
+
+            $attributes[sanitize_title($label)] = $attribute;
+        }
+
+        return $attributes;
     }
 
     private function assign_product_image(int $product_id, object $course): void {
