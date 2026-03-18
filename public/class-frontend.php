@@ -26,7 +26,6 @@ final class PCC_WooOTEC_Pro_Frontend {
 
     public function enqueue_assets(): void {
         wp_enqueue_style('pcc-woootec-frontend', PCC_WOOOTEC_PRO_URL . 'assets/css/frontend.css', array(), PCC_WOOOTEC_PRO_VERSION);
-        wp_enqueue_script('pcc-woootec-frontend', PCC_WOOOTEC_PRO_URL . 'assets/js/frontend.js', array(), PCC_WOOOTEC_PRO_VERSION, true);
     }
 
     public function render_my_courses_shortcode(): string {

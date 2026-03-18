@@ -17,10 +17,40 @@
 
         tab.addClass('is-active').attr('aria-selected', 'true');
         $('.pcc-tab-panel[data-panel="' + target + '"]').addClass('is-active').attr('hidden', false);
+        tab[0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
     }
 
     $(document).on('click', '.pcc-tab', function () {
         setActiveTab($(this));
+    });
+
+    $(document).on('keydown', '.pcc-tab', function (event) {
+        const current = tabs.index(this);
+        if (current === -1) {
+            return;
+        }
+
+        let nextIndex = current;
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+            nextIndex = (current + 1) % tabs.length;
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+            nextIndex = (current - 1 + tabs.length) % tabs.length;
+        } else {
+            return;
+        }
+
+        event.preventDefault();
+        tabs.eq(nextIndex).trigger('focus');
+        setActiveTab(tabs.eq(nextIndex));
+    });
+
+    $(document).on('click', '[data-jump-tab]', function () {
+        const target = $(this).data('jump-tab');
+        const tab = $('.pcc-tab[data-tab="' + target + '"]').first();
+        if (tab.length) {
+            setActiveTab(tab);
+            $('html, body').animate({ scrollTop: tab.offset().top - 80 }, 150);
+        }
     });
 
     if (tabs.length) {

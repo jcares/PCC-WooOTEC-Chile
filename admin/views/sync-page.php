@@ -7,7 +7,9 @@ if (!defined('ABSPATH')) {
 <div class="wrap pcc-admin-wrap">
     <div class="pcc-brand-bar">
         <div class="pcc-brand-bar__main">
-            <img class="pcc-brand-bar__logo" src="<?php echo esc_url(PCC_WOOOTEC_PRO_URL . 'assets/images/logo-pccurico.png'); ?>" alt="PCCurico">
+            <span class="pcc-brand-bar__logo-wrap">
+                <img class="pcc-brand-bar__logo" src="<?php echo esc_url(PCC_WOOOTEC_PRO_URL . 'assets/images/logo-pccurico.png'); ?>" alt="PCCurico">
+            </span>
             <div>
                 <h1>Sincronizacion Moodle -> WooCommerce</h1>
                 <p class="pcc-brand-bar__subtitle">Proceso guiado por etapas para categorias y cursos.</p>
@@ -22,6 +24,7 @@ if (!defined('ABSPATH')) {
     <div class="pcc-card pcc-sync-shell" data-sync-app>
         <div class="pcc-sync-header">
             <div>
+                <span class="pcc-section-kicker">Sincronizacion</span>
                 <h2>Sincronizacion interactiva</h2>
                 <p>Ejecuta la exportacion por etapas: primero categorias y luego cursos.</p>
             </div>
