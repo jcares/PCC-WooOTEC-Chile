@@ -69,9 +69,9 @@ final class PCC_WooOTEC_Pro_Updater {
         );
     }
 
-    public function handle_auto_update(bool $should_update, object $item): bool {
+    public function handle_auto_update($should_update, object $item): bool {
         if (empty($item->plugin) || $item->plugin !== PCC_WOOOTEC_PRO_BASENAME) {
-            return $should_update;
+            return (bool) $should_update;
         }
 
         return PCC_WooOTEC_Pro_Core::instance()->get_option('auto_update', 'no') === 'yes';
