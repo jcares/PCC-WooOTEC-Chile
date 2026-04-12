@@ -1,0 +1,230 @@
+# Copyright (C) 2026 WOO OTEC Moodle
+# This file is distributed under the same license as the WOO OTEC Moodle plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: WOO OTEC Moodle 3.0.7\n"
+"Report-Msgid-Bugs-To: https://github.com/woo-otec-moodle/issues\n"
+"POT-Creation-Date: 2026-04-11 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: admin/partials/cron-display.php:19
+msgid "Sincronización Automática (CRON)"
+msgstr ""
+
+#: admin/partials/cron-display.php:23
+msgid "Configura cada cuántas horas se syncronizan automáticamente los cursos desde Moodle"
+msgstr ""
+
+#: admin/partials/cron-display.php:30
+msgid "📊 Estado Actual del CRON"
+msgstr ""
+
+#: admin/partials/cron-display.php:37
+msgid "Estado"
+msgstr ""
+
+#: admin/partials/cron-display.php:47
+msgid "Intervalo Configurado"
+msgstr ""
+
+#: admin/partials/cron-display.php:54
+msgid "Próxima Ejecución"
+msgstr ""
+
+#: admin/partials/cron-display.php:65
+msgid "⚙️ Configurar Intervalo de Sincronización"
+msgstr ""
+
+#: admin/partials/cron-display.php:70
+msgid "⏱️ Intervalo de Sincronización (horas)"
+msgstr ""
+
+#: admin/partials/cron-display.php:84
+msgid "Guardar Configuración"
+msgstr ""
+
+#: admin/partials/sso-display.php:19
+msgid "Single Sign-On (SSO) - Acceso Automático a Moodle"
+msgstr ""
+
+#: admin/partials/sso-display.php:23
+msgid "Permite que usuarios accedan a Moodle automáticamente sin necesidad de ingresar credenciales"
+msgstr ""
+
+#: admin/partials/sso-display.php:71
+msgid "🔗 URL Base de Moodle"
+msgstr ""
+
+#: admin/partials/sso-display.php:81
+msgid "✓ Habilitar SSO - Activar login automático a Moodle"
+msgstr ""
+
+#: admin/partials/mapper-display.php:19
+msgid "Mapeador de Campos (Field Mapper)"
+msgstr ""
+
+#: admin/partials/mapper-display.php:23
+msgid "Controla qué datos de Moodle se sincronizan a WooCommerce automáticamente"
+msgstr ""
+
+#: includes/class-cron-manager.php:86
+msgid "WOO OTEC Moodle - Cada %d hora(s)"
+msgstr ""
+
+#: includes/class-cron-manager.php:111
+msgid "[CRON] Iniciando sincronización automática de cursos"
+msgstr ""
+
+#: includes/class-cron-manager.php:128
+msgid "[CRON] Sincronización completada correctamente"
+msgstr ""
+
+#: includes/class-cron-manager.php:137
+msgid "[CRON] Error en sincronización: "
+msgstr ""
+
+#: includes/class-sso-manager.php:114
+msgid "La URL de Moodle no puede estar vacía"
+msgstr ""
+
+#: includes/class-sso-manager.php:120
+msgid "La URL de Moodle no es válida"
+msgstr ""
+
+#: includes/class-sso-manager.php:125
+msgid "Se recomienda usar HTTPS para URLs de Moodle en producción"
+msgstr ""
+
+#: woocommerce-display.php (WC Integration Module)
+msgid "Matricularse"
+msgstr ""
+
+#: enrollment notifications
+msgid "Has sido matriculado en el curso"
+msgstr ""
+
+#: error messages
+msgid "Error al conectar con Moodle"
+msgstr ""
+
+#: error messages
+msgid "Curso no disponible"
+msgstr ""
+
+#: admin dashboard
+msgid "Última sincronización"
+msgstr ""
+
+#: admin dashboard  
+msgid "Próxima sincronización"
+msgstr ""
+
+#: settings page
+msgid "URL de Moodle"
+msgstr ""
+
+#: settings page
+msgid "Token de API"
+msgstr ""
+
+#: settings page
+msgid "ID de Rol"
+msgstr ""
+
+#: settings page
+msgid "Crear usuario automáticamente"
+msgstr ""
+
+#: course sync
+msgid "Sincronizando cursos..."
+msgstr ""
+
+#: course sync
+msgid "Sincronización completada"
+msgstr ""
+
+#: metadata page
+msgid "Campos disponibles"
+msgstr ""
+
+#: metadata page
+msgid "Campos seleccionados"
+msgstr ""
+
+#: email templates
+msgid "Hola {nombre},"
+msgstr ""
+
+#: email templates
+msgid "Te has matriculado en el curso {curso_nombre}"
+msgstr ""
+
+#: email templates
+msgid "Acceder a Moodle"
+msgstr ""
+
+#: user management
+msgid "Usuarios sincronizados"
+msgstr ""
+
+#: user management
+msgid "Último acceso"
+msgstr ""
+
+#: logs
+msgid "Registro de operaciones"
+msgstr ""
+
+#: logs
+msgid "Estado de operación"
+msgstr ""
+
+#: logs
+msgid "Exitoso"
+msgstr ""
+
+#: logs
+msgid "Error"
+msgstr ""
+
+#: field mapper
+msgid "Nombre Completo del Curso"
+msgstr ""
+
+#: field mapper
+msgid "Descripción"
+msgstr ""
+
+#: field mapper
+msgid "Fecha de Inicio"
+msgstr ""
+
+#: field mapper
+msgid "Fecha de Fin"
+msgstr ""
+
+#: field mapper
+msgid "Profesor/Instructor"
+msgstr ""
+
+#: field mapper
+msgid "Duración (horas)"
+msgstr ""
+
+#: field mapper
+msgid "Modalidad"
+msgstr ""
+
+#: field mapper
+msgid "Código SENCE (Chile)"
+msgstr ""
+
+#: field mapper
+msgid "Total de Horas SENCE"
+msgstr ""

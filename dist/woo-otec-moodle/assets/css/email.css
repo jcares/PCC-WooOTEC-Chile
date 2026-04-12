@@ -1,0 +1,171 @@
+/**
+ * Email CSS - Woo OTEC Moodle
+ * Estilos para plantillas de email
+ * @version 3.0.7
+ */
+
+/* Email Container */
+.wom-preview-email {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Email Header */
+.wom-email-header {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.wom-email-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.wom-email-header p {
+    margin: 10px 0 0 0;
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+/* Email Content */
+.wom-email-content {
+    padding: 30px;
+    color: #1f2937;
+    line-height: 1.6;
+}
+
+/* Email Courses List */
+.wom-email-courses-list {
+    background: #f9fafb;
+    border-left: 4px solid #6366f1;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.wom-email-course-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 14px;
+    color: #374151;
+}
+
+.wom-email-course-item:last-child {
+    border-bottom: none;
+}
+
+/* Email Button Container */
+.wom-email-button-container {
+    text-align: center;
+    margin: 30px 0;
+}
+
+/* Email Button */
+.wom-email-button {
+    background: #0073aa;
+    color: white !important;
+    padding: 12px 30px;
+    text-decoration: none;
+    border-radius: 6px;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 20px;
+    transition: background 0.3s ease;
+}
+
+.wom-email-button:hover {
+    background: #005a87;
+}
+
+/* Email Footer */
+.wom-email-footer {
+    color: #6b7280;
+    font-size: 12px;
+    border-top: 1px solid #e5e7eb;
+    padding: 20px;
+    text-align: center;
+}
+
+.wom-email-footer p {
+    margin: 0;
+}
+
+/* Logo Container */
+.wom-logo-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.wom-logo-container img {
+    max-width: 200px;
+    max-height: 100px;
+}
+
+/* Info Box */
+.wom-info-box {
+    background: #e7f3ff;
+    border-left: 4px solid #0073aa;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #1e40af;
+}
+
+.wom-info-box-success {
+    background: #d4edda;
+    border-color: #28a745;
+}
+
+.wom-info-box-success strong {
+    color: #28a745;
+}
+
+.wom-info-box-success p {
+    margin: 10px 0 0 0;
+    font-size: 13px;
+}
+
+/* Contact Text */
+.wom-email-contact {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 30px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .wom-preview-email {
+        border-radius: 0;
+        max-width: 100%;
+    }
+
+    .wom-email-header {
+        padding: 30px 15px;
+    }
+
+    .wom-email-header h2 {
+        font-size: 20px;
+    }
+
+    .wom-email-content {
+        padding: 20px 15px;
+    }
+
+    .wom-email-button-container {
+        margin: 20px 0;
+    }
+
+    .wom-email-button {
+        width: 100%;
+        padding: 12px 20px;
+    }
+}
