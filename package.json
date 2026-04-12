@@ -1,9 +1,0 @@
-{
-  "name": "pcc-woootec-chile-pro",
-  "version": "2.0.0",
-  "private": true,
-  "description": "Build metadata for PCC-WooOTEC-Chile PRO",
-  "scripts": {
-    "lint": "echo \"No frontend build configured\""
-  }
-}
