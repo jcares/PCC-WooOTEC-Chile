@@ -27,19 +27,19 @@
 				return;
 			}
 
-			// Determinar template activo
-			const urlParams = new URLSearchParams(window.location.search);
-			this.currentTemplate = urlParams.get('template') || 'product-catalogue';
+		// Verificar que el contenedor principal existe
+		const previewContainers = document.querySelectorAll('[id^="wom-preview-"]');
+		if (previewContainers.length === 0) {
+			console.error('No se encontraron contenedores de preview. Verifica que template-builder.php se cargó correctamente.');
+			return;
+		}
 
-			console.log('Template Builder inicializado - Template activo:', this.currentTemplate);
+		// Determinar template activo
+		const urlParams = new URLSearchParams(window.location.search);
+		this.currentTemplate = urlParams.get('template') || 'product-catalogue';
 
-			// Setup jQuery color picker para inputs con clase .wom-color-picker
-			this.setupColorPickersWP();
-
-			// Event listeners
-			this.setupEventListeners();
-
-			// Cargar preview inicial (después de pequeño delay para asegurar DOM listo)
+		console.log('Template Builder inicializado - Template activo:', this.currentTemplate);
+		console.log('Contenedores disponibles:', Array.from(previewContainers).map(el => el.id));
 			const self = this;
 			setTimeout(() => {
 				self.loadPreview();
@@ -186,14 +186,21 @@
 		loadPreview: function() {
 			const self = this;
 			const config = this.getCurrentConfig();
-			const productId = this.currentTemplate === 'sample-product' ? $('#sample-product-select').val() : null;
-
-			// Si es sample-product y no hay producto seleccionado, usar placeholder
-			if (this.currentTemplate === 'sample-product' && !productId) {
-				$('#wom-preview-' + this.currentTemplate).html(
-					'<div style="padding: 20px; text-align: center; color: #999;">Selecciona un producto para ver el preview</div>'
-				);
-				return;
+			
+			// Para sample-product: obtener product_id del select o usar el primero
+			let productId = null;
+			if (this.currentTemplate === 'sample-product') {
+				const $select = $('#sample-product-select');
+				productId = $select.length ? $select.val() : null;
+				
+				// Si no hay select (primera carga), intentar obtener del DOM
+				if (!productId && !$select.length) {
+					// Intentar obtener el primer option si existe
+					const $firstOption = $('select option').first();
+					if ($firstOption.length) {
+						productId = $firstOption.val();
+					}
+				}
 			}
 
 			// Mostrar loading
@@ -202,7 +209,17 @@
 				$loadingEl.show();
 			}
 
-			console.log('Cargando preview para:', this.currentTemplate, 'Config:', config);
+			console.log('Cargando preview para:', this.currentTemplate, 'Product ID:', productId, 'Config:', config);
+
+			// Validar que tenemos las variables necesarias
+			if (typeof wooOtecMoodle === 'undefined' || !wooOtecMoodle.ajax_url) {
+				console.error('CRÍTICO: wooOtecMoodle no está disponible o no tiene ajax_url');
+				const $preview = $('#wom-preview-' + this.currentTemplate);
+				if ($preview.length) {
+					$preview.html('<div style="padding: 20px; text-align: center; color: #d32f2f;">Error: No se pudo inicializar AJAX. Recarga la página.</div>');
+				}
+				return;
+			}
 
 			return $.ajax({
 				url: wooOtecMoodle.ajax_url,
@@ -246,8 +263,19 @@
 			const previewSelector = '#wom-preview-' + this.currentTemplate;
 			const $preview = $(previewSelector);
 
+			console.log('Renderizando preview con selector:', previewSelector);
+			console.log('Elementos encontrados:', $preview.length);
+
 			if ($preview.length === 0) {
-				console.warn('Preview container no encontrado:', previewSelector);
+				// Intentar encontrar cualquier contenedor de preview como fallback
+				const $fallbackPreview = $('[id^="wom-preview-"]').first();
+				if ($fallbackPreview.length > 0) {
+					console.warn('Contenedor específico no encontrado. Usando fallback:', $fallbackPreview.attr('id'));
+					$fallbackPreview.html(html);
+					return;
+				}
+				
+				console.error('CRÍTICO: Ningún contenedor de preview encontrado. IDs disponibles:', Array.from(document.querySelectorAll('[id^="wom-preview-"]')).map(el => el.id));
 				return;
 			}
 

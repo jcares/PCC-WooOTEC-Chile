@@ -1,6 +1,17 @@
 <?php
 /**
- * Vista de Dashboard Premium con Actividad Reciente.
+ * Vista de Dashboard - PÁGINA PRINCIPAL
+ * 
+ * ¿Qué hace?
+ * - Muestra estado general del plugin
+ * - Estadísticas de sincronización
+ * - Resumen de actividad reciente
+ * 
+ * ¿Qué debe funcionar?
+ * ✅ Cargar sin errores
+ * ✅ Mostrar estadísticas (cursos, matrículas, estado API)
+ * ✅ Botón "Probar Conexión" (AJAX)
+ * ✅ Botones de acción rápida (links a otras páginas)
  */
 include WOO_OTEC_MOODLE_PATH . 'admin/partials/tabs-header.php';
 
@@ -16,27 +27,27 @@ $recent_activity = $logger->get_recent_logs( 5 );
 
 <div class="wom-cards-grid">
     <div class="wom-card">
-        <div class="wom-card-icon" style="background:rgba(79, 70, 229, 0.1); color:#4f46e5;">
+        <div class="wom-card-icon wom-icon-primary">
             <span class="dashicons dashicons-admin-links"></span>
         </div>
         <div class="wom-card-content">
             <h3>Estado API</h3>
             <p class="wom-stat"><?php echo esc_html( $api_status ); ?></p>
-            <button type="button" id="wom-test-connection" class="wom-btn wom-btn--secondary" style="padding: 4px 10px; font-size: 11px; margin-top: 8px; border: 1px solid #ddd; background: #f5f5f5; color: #333;">
-                <span class="dashicons dashicons-update-alt" style="font-size: 12px; width: 12px; height: 12px; margin-right: 4px;"></span> Probar
+            <button type="button" id="wom-test-connection" class="wom-btn wom-btn--secondary wom-btn-icon-small">
+                <span class="dashicons dashicons-update-alt"></span> Probar
             </button>
-            <div id="wom-test-result" style="margin-top: 8px; font-size: 11px; display: none; padding: 6px; border-radius: 3px;"></div>
+            <div id="wom-test-result" class="wom-result-message" style="display: none;"></div>
         </div>
     </div>
 
     <div class="wom-card">
-        <div class="wom-card-icon" style="background:rgba(16, 185, 129, 0.1); color:#10b981;">
+        <div class="wom-card-icon wom-icon-success">
             <span class="dashicons dashicons-welcome-learn-more"></span>
         </div>
         <div class="wom-card-content">
             <h3>Cursos Vinculados</h3>
             <p class="wom-stat"><?php echo esc_html( $courses_count ); ?></p>
-            <a href="?page=woo-otec-moodle-courses" class="wom-btn" style="margin-top:10px; display:inline-block; text-decoration:none;">
+            <a href="?page=woo-otec-moodle-courses" class="wom-btn wom-btn-action">
                 <span class="dashicons dashicons-external"></span> Ver Cursos
             </a>
         </div>

@@ -1,7 +1,19 @@
 <?php
 /**
- * Vista de Configuración Consolidada (Settings + SSO)
- * Integración de Moodle y Single Sign-On
+ * Vista de Configuración General
+ * 
+ * ¿Qué hace?
+ * - Token y URL de Moodle
+ * - Opciones globales del plugin
+ * 
+ * ¿Qué debe funcionar?
+ * ✅ Guardar token de Moodle
+ * ✅ Guardar URL de Moodle
+ * ✅ Botón "Probar Conexión" (AJAX)
+ * ✅ Mostrar resultado de prueba (✓/✗)
+ * ⚠️ TOKEN EXPUESTO: d4c5be6e5cefe4bbb025ae28ba5630df
+ *    Debe ser regenerado en Moodle admin
+ * 
  * v3.0.8
  */
 

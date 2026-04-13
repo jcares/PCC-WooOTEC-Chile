@@ -1,6 +1,15 @@
 <?php
 /**
- * Vista de WooCommerce - Configuración específica del flujo de compra y matriculación.
+ * Página de WooCommerce
+ * 
+ * ¿Qué hace?
+ * - Configuración específica de integración WooCommerce
+ * - Mapeo de categorías y atributos
+ * 
+ * ¿Qué debe funcionar?
+ * ✅ Configuración de categoría de cursos
+ * ✅ Mapeo de atributos (precio, descripción, etc.)
+ * ✅ Opciones de carrito y checkout
  */
 include WOO_OTEC_MOODLE_PATH . 'admin/partials/tabs-header.php';
 

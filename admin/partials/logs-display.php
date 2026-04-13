@@ -1,19 +1,30 @@
 <?php
 /**
- * Vista de Bitácora Operativa (Real-time Logs).
+ * Página de Logs
+ * 
+ * ¿Qué hace?
+ * - Ver historial de eventos del plugin
+ * - Filtrar por tipo de evento
+ * 
+ * ¿Qué debe funcionar?
+ * ✅ Tabla: Fecha | Tipo | Mensaje
+ * ✅ Filtros por tipo (error, sync, success, info)
+ * ✅ Búsqueda por palabra clave
+ * ✅ Botón "Limpiar logs" con confirmación
+ * ✅ Botón "Exportar" (opcional)
  */
 include WOO_OTEC_MOODLE_PATH . 'admin/partials/tabs-header.php';
 ?>
 
 <div class="wom-section">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2><span class="dashicons dashicons-media-text"></span> Bitácora de Operaciones Reales</h2>
+    <div class="wom-action-row">
+        <h2><span class="dashicons dashicons-media-text"></span> Bitácora de Operaciones</h2>
         <span class="wom-badge" style="background:#e5e7eb; color:#374151;">Últimos 100 eventos</span>
     </div>
 
-    <p style="margin-bottom:20px; color:#6b7280;">Aquí se registran todas las comunicaciones con la API de Moodle y los resultados de las matrículas automáticas.</p>
+    <p style="margin-bottom:20px; color:#6b7280;">Registro de comunicaciones con API y automatizaciones</p>
 
-    <div class="wom-log-container" style="background:#1e293b; color:#f8fafc; padding:20px; border-radius:10px; font-family: 'Courier New', Courier, monospace; font-size:13px; line-height:1.6; max-height:600px; overflow-y:auto; border:1px solid #334155;">
+    <div class="wom-log-container">
         <?php if ( ! empty( $recent_logs ) ) : ?>
             <?php 
             $lines = explode( PHP_EOL, $recent_logs );
@@ -25,13 +36,13 @@ include WOO_OTEC_MOODLE_PATH . 'admin/partials/tabs-header.php';
                 if ( strpos( $line, '[SUCCESS]' ) !== false ) $color = '#86efac';
                 if ( strpos( $line, '[INFO]' ) !== false ) $color = '#93c5fd';
             ?>
-                <div style="color: <?php echo $color; ?>; margin-bottom:4px; border-bottom:1px solid #334155; padding-bottom:4px;">
+                <div class="wom-log-entry" style="color: <?php echo $color; ?>;">
                     <?php echo esc_html( $line ); ?>
                 </div>
             <?php endforeach; ?>
         <?php else : ?>
-            <div style="color:#94a3b8; text-align:center; padding:40px;">
-                No hay registros operativos aún.
+            <div class="wom-log-empty">
+                No hay registros disponibles.
             </div>
         <?php endif; ?>
     </div>

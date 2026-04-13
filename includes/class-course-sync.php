@@ -32,7 +32,6 @@ class Course_Sync {
 
 		// AJAX para sincronización manual
 		add_action( 'wp_ajax_woo_otec_sync_courses', array( $this, 'ajax_sync_courses' ) );
-		add_action( 'wp_ajax_wom_set_product_image', array( $this, 'ajax_set_product_image' ) );
 		add_action( 'wp_ajax_wom_sync_courses', array( $this, 'ajax_sync_courses_with_template' ) );
 		
 		// Añadir campo de ID de Moodle en la edición del producto
@@ -279,31 +278,6 @@ class Course_Sync {
 		update_post_meta( $post_id, '_moodle_course_id', $moodle_id );
 	}
 
-	/**
-	 * AJAX Handler para establecer imagen de producto
-	 */
-	public function ajax_set_product_image() {
-		check_ajax_referer( 'woo-otec-moodle-nonce', 'nonce' );
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( 'No autorizado' );
-		}
-
-		$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0;
-		$attachment_id = isset( $_POST['attachment_id'] ) ? intval( $_POST['attachment_id'] ) : 0;
-
-		if ( ! $product_id || ! $attachment_id ) {
-			wp_send_json_error( 'Parámetros requeridos faltantes' );
-		}
-
-		set_post_thumbnail( $product_id, $attachment_id );
-		$this->logger->log( 'SUCCESS', "Imagen establecida para producto ID: $product_id" );
-
-		wp_send_json_success( array(
-			'message' => 'Imagen actualizada correctamente',
-			'attachment_id' => $attachment_id,
-		) );
-	}
 
 	/**
 	 * AJAX Handler para sincronizar cursos aplicando template settings
@@ -345,7 +319,7 @@ class Course_Sync {
 			}
 		}
 
-		$this->logger->log_sync( "Sincronización completada: $synced cursos, $applied con template aplicado" );
+		$this->logger->log_sync( 'course_sync', $synced, "Cursos sincronizados: $synced, con template aplicado: $applied" );
 
 		wp_send_json_success( array(
 			'message' => "Sincronización completada: $synced cursos actualizados",

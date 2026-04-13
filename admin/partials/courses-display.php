@@ -1,11 +1,23 @@
 <?php
 /**
- * Vista de Cursos - Sincronización con Moodle
+ * Vista de Cursos
+ * 
+ * ¿Qué hace?
+ * - Listar cursos de Moodle como productos WooCommerce
+ * - Sincronizar cursos desde Moodle
+ * - Editar imágenes y precios de cursos
+ * 
+ * ¿Qué debe funcionar?
+ * ✅ Botón "Sincronizar Cursos Ahora" (AJAX)
+ * ✅ Tabla: ID | Nombre | Imagen | Precio | Acciones
+ * ✅ Botón 📷 cámara → Media Uploader
+ * ✅ Editar precio inline con AJAX
+ * ✅ Botón 🗑️ eliminar producto
+ * ✅ Notificaciones de éxito/error
  */
 
 include WOO_OTEC_MOODLE_PATH . 'admin/partials/tabs-header.php';
 
-// Obtener cursos sincronizados
 $products = get_posts( array(
     'post_type'      => 'product',
     'meta_key'       => '_moodle_course_id',
@@ -17,15 +29,13 @@ $products = get_posts( array(
 	<div class="wom-section">
 		<h2><span class="dashicons dashicons-welcome-learn-more"></span> Cursos Sincronizados</h2>
 		
-		<!-- Botón de sincronización -->
-		<div style="margin-bottom: 20px;">
-			<button type="button" id="wom-sync-now" class="wom-btn wom-btn-info">
+		<div class="wom-form-row-spacing">
+			<button type="button" id="wom-sync-now" class="wom-btn wom-btn-primary">
 				<span class="dashicons dashicons-update"></span> Sincronizar desde Moodle
 			</button>
-			<div id="sync-message" style="margin-top: 10px;"></div>
+			<div id="sync-message" class="wom-sync-message"></div>
 		</div>
 
-		<!-- Tabla de cursos -->
 		<table class="wp-list-table widefat fixed striped">
 			<thead>
 				<tr>
@@ -55,7 +65,7 @@ $products = get_posts( array(
 					<?php endforeach; ?>
 				<?php else : ?>
 					<tr>
-						<td colspan="4" style="text-align: center; padding: 20px; color: #999;">
+						<td colspan="4" class="wom-table-empty">
 							No hay cursos sincronizados. Haz clic en "Sincronizar desde Moodle".
 						</td>
 					</tr>

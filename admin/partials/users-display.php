@@ -1,6 +1,16 @@
 <?php
 /**
- * Vista de Usuarios / Matriculados (Placeholder).
+ * Página de Usuarios
+ * 
+ * ¿Qué hace?
+ * - Sincronizar usuarios desde Moodle a WordPress
+ * - Gestionar usuarios creados
+ * 
+ * ¿Qué debe funcionar?
+ * ✅ Botón "Sincronizar Usuarios" (AJAX)
+ * ✅ Tabla: Email | Nombre | Rol en Moodle | Estado
+ * ✅ Mostrar usuarios sincronizados
+ * ✅ Copiar contraseña temporal
  */
 include WOO_OTEC_MOODLE_PATH . 'admin/partials/tabs-header.php';
 ?>

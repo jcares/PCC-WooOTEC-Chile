@@ -85,9 +85,10 @@ class Template_Manager {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'wp_ajax_wom_save_template_config', array( $this, 'ajax_save_template_config' ) );
-		add_action( 'wp_ajax_wom_preview_template', array( $this, 'ajax_preview_template' ) );
-		add_action( 'wp_ajax_wom_reset_template', array( $this, 'ajax_reset_template' ) );
+		// Nota: Los hooks AJAX se registran desde Admin_Settings para evitar duplicación
+		// add_action( 'wp_ajax_wom_save_template_config', array( $this, 'ajax_save_template_config' ) );
+		// add_action( 'wp_ajax_wom_preview_template', array( $this, 'ajax_preview_template' ) );
+		// add_action( 'wp_ajax_wom_reset_template', array( $this, 'ajax_reset_template' ) );
 	}
 
 	/**
@@ -299,7 +300,12 @@ class Template_Manager {
 		}
 
 		$template_id = isset( $_POST['template_id'] ) ? sanitize_text_field( $_POST['template_id'] ) : '';
-		$config      = isset( $_POST['config'] ) ? json_decode( stripslashes( $_POST['config'] ), true ) : array();
+		$config_json = isset( $_POST['config'] ) ? sanitize_text_field( wp_unslash( $_POST['config'] ) ) : '{}';
+		$config      = json_decode( $config_json, true );
+		
+		if ( ! is_array( $config ) ) {
+			$config = array();
+		}
 
 		if ( ! $template_id || ! isset( $this->templates[ $template_id ] ) ) {
 			wp_send_json_error( 'Template inválido' );

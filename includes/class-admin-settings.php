@@ -55,15 +55,15 @@ class Admin_Settings {
 	/**
 	 * Constructor.
 	 */
-	public function __construct( $api_client, $logger, $metadata_manager = null, $template_manager = null ) {
+	public function __construct( $api_client, $logger, $metadata_manager = null, $template_manager = null, $template_customizer = null, $preview_generator = null ) {
 		$this->api_client       = $api_client;
 		$this->logger           = $logger;
 		$this->metadata_manager = $metadata_manager;
 
 		// Instanciar Template Managers
 		$this->template_manager   = $template_manager ?: new \Woo_OTEC_Moodle\Template_Manager();
-		$this->template_customizer = new \Woo_OTEC_Moodle\Template_Customizer( $this->template_manager );
-		$this->preview_generator   = new \Woo_OTEC_Moodle\Preview_Generator( $this->template_manager );
+		$this->template_customizer = $template_customizer ?: new \Woo_OTEC_Moodle\Template_Customizer( $this->template_manager );
+		$this->preview_generator   = $preview_generator ?: new \Woo_OTEC_Moodle\Preview_Generator( $this->template_manager );
 		$this->field_mapper        = new \Woo_OTEC_Moodle\Field_Mapper();
 
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
@@ -140,30 +140,32 @@ class Admin_Settings {
 			return;
 		}
 
-		wp_enqueue_style( 'woo-otec-moodle-admin-style', WOO_OTEC_MOODLE_URL . 'admin/css/admin-style.css', array(), time() );
-		wp_enqueue_style( 'woo-otec-moodle-admin-forms', WOO_OTEC_MOODLE_URL . 'admin/css/admin-forms.css', array(), time() );
-		wp_enqueue_script( 'woo-otec-moodle-admin-js', WOO_OTEC_MOODLE_URL . 'admin/js/admin-app.js', array( 'jquery' ), time(), true );
+		wp_enqueue_style( 'woo-otec-moodle-admin-style', WOO_OTEC_MOODLE_URL . 'admin/css/admin-style.css', array(), WOO_OTEC_MOODLE_VERSION );
+		wp_enqueue_style( 'woo-otec-moodle-admin-forms', WOO_OTEC_MOODLE_URL . 'admin/css/admin-forms.css', array(), WOO_OTEC_MOODLE_VERSION );
+		wp_enqueue_script( 'woo-otec-moodle-admin-js', WOO_OTEC_MOODLE_URL . 'admin/js/admin-app.js', array( 'jquery' ), WOO_OTEC_MOODLE_VERSION, true );
 
 		// Template Builder Assets
 		if ( strpos( $hook, 'template-builder' ) !== false ) {
-			wp_enqueue_style( 'wom-template-builder-style', WOO_OTEC_MOODLE_URL . 'admin/css/template-builder.css', array(), time() );
-			wp_enqueue_script( 'wom-template-builder-js', WOO_OTEC_MOODLE_URL . 'admin/js/template-builder.js', array( 'jquery', 'wp-color-picker' ), time(), true );
+			wp_enqueue_style( 'wom-template-builder-style', WOO_OTEC_MOODLE_URL . 'admin/css/template-builder.css', array(), WOO_OTEC_MOODLE_VERSION );
+			wp_enqueue_script( 'wom-template-builder-js', WOO_OTEC_MOODLE_URL . 'admin/js/template-builder.js', array( 'jquery', 'wp-color-picker' ), WOO_OTEC_MOODLE_VERSION, true );
 			wp_enqueue_style( 'wp-color-picker' );
 		}
 
 		wp_enqueue_media();
 
-		wp_localize_script( 'woo-otec-moodle-admin-js', 'wooOtecMoodle', array(
+		// Objeto global para TODOS los scripts del plugin
+		$woo_otec_data = array(
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
 			'nonce'    => wp_create_nonce( 'woo-otec-moodle-nonce' ),
-		) );
+		);
 
-		// Localizar para Template Builder también
+		// UNA sola localización para admin-app.js (será disponible globalmente)
+		wp_localize_script( 'woo-otec-moodle-admin-js', 'wooOtecMoodle', $woo_otec_data );
+
+		// Template Builder: localizar solo si está activo
 		if ( strpos( $hook, 'template-builder' ) !== false ) {
-			wp_localize_script( 'wom-template-builder-js', 'wooOtecMoodle', array(
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
-				'nonce'    => wp_create_nonce( 'woo-otec-moodle-nonce' ),
-			) );
+			// Reutilizar el mismo objeto global en template-builder.js
+			wp_localize_script( 'wom-template-builder-js', 'wooOtecMoodle', $woo_otec_data );
 		}
 	}
 
@@ -271,7 +273,6 @@ class Admin_Settings {
 		}
 
 		$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0;
-		$fields = isset( $_POST['fields'] ) ? (array) $_POST['fields'] : array();
 
 		if ( ! $product_id ) {
 			wp_send_json_error( 'ID de producto requerido' );
@@ -280,10 +281,6 @@ class Admin_Settings {
 		$product = wc_get_product( $product_id );
 		if ( ! $product ) {
 			wp_send_json_error( 'Producto no encontrado' );
-		}
-
-		if ( empty( $fields ) ) {
-			wp_send_json_error( 'Selecciona al menos un campo para ver la preview.' );
 		}
 
 		// Obtener configuración del plugin
@@ -316,16 +313,19 @@ class Admin_Settings {
 			?>
 			<div style="padding: 20px;">
 				<h3><?php echo esc_html( $product->get_name() ); ?></h3>
-				<?php if ( in_array( 'summary', $fields, true ) ) : ?>
-					<p><?php echo wp_kses_post( wp_trim_words( $product->get_description(), 50 ) ); ?></p>
-				<?php endif; ?>
+				<p><strong>Precio:</strong> <?php echo wp_kses_post( $product->get_price_html() ); ?></p>
+				<p><?php echo wp_kses_post( wp_trim_words( $product->get_description(), 50 ) ); ?></p>
 			</div>
 			<?php
 		}
 		
 		$preview_html = ob_get_clean();
 
-		wp_send_json_success( $preview_html );
+		// Retornar objeto con title y html
+		wp_send_json_success( array(
+			'title' => $product->get_name(),
+			'html'  => $preview_html
+		) );
 	}
 
 	/**
@@ -363,6 +363,9 @@ class Admin_Settings {
 
 		wp_send_json_success( 'Metadatos reseteados' );
 	}
+
+	/**
+	 * AJAX Handler para guardar intervalo de CRON
 	 */
 	public function ajax_save_cron_interval() {
 		check_ajax_referer( 'woo-otec-moodle-nonce', 'nonce' );
@@ -570,8 +573,8 @@ class Admin_Settings {
 			return false;
 		}
 
-		// Descargar imagen
-		$tmp = download_url( $image_url );
+		// Descargar imagen con timeout
+		$tmp = download_url( $image_url, 30 );
 		if ( is_wp_error( $tmp ) ) {
 			return false;
 		}
@@ -593,65 +596,53 @@ class Admin_Settings {
 	}
 
 	/**
-	 * AJAX Handler para guardar metadatos
-	 */
-	public function ajax_save_metadata() {
-		check_ajax_referer( 'woo-otec-moodle-nonce', 'nonce' );
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( 'No autorizado' );
-		}
-
-		$metadata = isset( $_POST['metadata'] ) ? json_decode( sanitize_text_field( $_POST['metadata'] ), true ) : array();
-
-		if ( ! is_array( $metadata ) ) {
-			wp_send_json_error( 'Formato inválido' );
-		}
-
-		update_option( 'woo_otec_moodle_metadata_enabled', $metadata );
-		$this->logger->log( 'SUCCESS', 'Metadatos guardados' );
-
-		wp_send_json_success( 'Metadatos guardiados' );
-	}
-
-	/**
-	 * AJAX Handler para resetear metadatos
-	 */
-	public function ajax_reset_metadata() {
-		check_ajax_referer( 'woo-otec-moodle-nonce', 'nonce' );
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( 'No autorizado' );
-		}
-
-		delete_option( 'woo_otec_moodle_metadata_enabled' );
-		$this->logger->log( 'SUCCESS', 'Metadatos reseteados' );
-
-		wp_send_json_success( 'Metadatos reseteados' );
-	}
-
-	/**
 	 * AJAX Handler para preview de template
 	 */
 	public function ajax_preview_template() {
 		check_ajax_referer( 'woo-otec-moodle-nonce', 'nonce' );
 
-		$template = isset( $_POST['template'] ) ? sanitize_text_field( $_POST['template'] ) : '';
-		$config = isset( $_POST['config'] ) ? json_decode( sanitize_text_field( $_POST['config'] ), true ) : array();
+		try {
+			// Aceptar tanto "template" como "template_id" para compatibilidad
+			$template = isset( $_POST['template_id'] ) ? sanitize_text_field( $_POST['template_id'] ) : '';
+			if ( empty( $template ) ) {
+				$template = isset( $_POST['template'] ) ? sanitize_text_field( $_POST['template'] ) : '';
+			}
 
-		if ( empty( $template ) ) {
-			wp_send_json_error( 'Template requerido' );
+			$config = isset( $_POST['config'] ) ? json_decode( wp_unslash( $_POST['config'] ), true ) : array();
+			$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : null;
+
+			if ( empty( $template ) ) {
+				wp_send_json_error( 'Template requerido' );
+			}
+
+			// Validar que tenemos template_manager
+			if ( ! $this->template_manager ) {
+				$this->template_manager = new \Woo_OTEC_Moodle\Template_Manager();
+			}
+
+			// Validar que preview_generator existe
+			if ( ! $this->preview_generator ) {
+				$this->preview_generator = new \Woo_OTEC_Moodle\Preview_Generator( $this->template_manager );
+			}
+
+			// Si config está vacía, obtener configuración guardada
+			if ( empty( $config ) ) {
+				$config = $this->template_manager->get_saved_config( $template );
+			}
+
+			// Generar preview usando Preview_Generator
+			$preview_html = $this->preview_generator->generate_preview( $template, $config, $product_id );
+
+			if ( empty( $preview_html ) ) {
+				wp_send_json_error( 'No se pudo generar el preview' );
+			}
+
+			wp_send_json_success( array( 'html' => $preview_html ) );
+
+		} catch ( \Exception $e ) {
+			$this->logger->log( 'ERROR', 'ajax_preview_template error: ' . $e->getMessage() );
+			wp_send_json_error( 'Error: ' . $e->getMessage() );
 		}
-
-		// Generar preview HTML
-		$preview_html = '<div style="padding: 20px; text-align: center;">';
-		$preview_html .= '<p style="color: ' . ( $config['colors']['text'] ?? '#333' ) . '; font-size: 16px; margin: 0 0 10px;">';
-		$preview_html .= esc_html( $config['texts']['title'] ?? 'Vista Previa' );
-		$preview_html .= '</p>';
-		$preview_html .= '<button style="background: ' . ( $config['colors']['primary'] ?? '#6366f1' ) . '; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">';
-		$preview_html .= esc_html( $config['texts']['button_label'] ?? 'Botón' );
-		$preview_html .= '</button>';
-		$preview_html .= '</div>';
-
-		wp_send_json_success( $preview_html );
 	}
 
 	/**
@@ -664,13 +655,17 @@ class Admin_Settings {
 		}
 
 		$template = isset( $_POST['template'] ) ? sanitize_text_field( $_POST['template'] ) : '';
+		if ( empty( $template ) ) {
+			$template = isset( $_POST['template_id'] ) ? sanitize_text_field( $_POST['template_id'] ) : '';
+		}
+
 		$config = isset( $_POST['config'] ) ? json_decode( sanitize_text_field( $_POST['config'] ), true ) : array();
 
 		if ( empty( $template ) ) {
 			wp_send_json_error( 'Template requerido' );
 		}
 
-		// Sanitizar y guardar
+		// Sanitizar y guardar - soportar tanto 'text' como 'settings'
 		$saved_config = array(
 			'colors' => array(
 				'primary'      => isset( $config['colors']['primary'] ) ? sanitize_hex_color( $config['colors']['primary'] ) : '#6366f1',
@@ -678,10 +673,10 @@ class Admin_Settings {
 				'text_light'   => isset( $config['colors']['text_light'] ) ? sanitize_hex_color( $config['colors']['text_light'] ) : '#6b7280',
 				'border'       => isset( $config['colors']['border'] ) ? sanitize_hex_color( $config['colors']['border'] ) : '#e5e7eb',
 			),
-			'texts'  => array(
-				'title'        => isset( $config['texts']['title'] ) ? sanitize_text_field( $config['texts']['title'] ) : 'Cursos Disponibles',
-				'button_label' => isset( $config['texts']['button_label'] ) ? sanitize_text_field( $config['texts']['button_label'] ) : 'Seleccionar',
-				'cart_label'   => isset( $config['texts']['cart_label'] ) ? sanitize_text_field( $config['texts']['cart_label'] ) : 'Ir al Carrito',
+			'settings' => array(
+				'title'        => isset( $config['settings']['title'] ) ? sanitize_text_field( $config['settings']['title'] ) : 'Cursos Disponibles',
+				'button_label' => isset( $config['settings']['button_label'] ) ? sanitize_text_field( $config['settings']['button_label'] ) : 'Seleccionar',
+				'cart_label'   => isset( $config['settings']['cart_label'] ) ? sanitize_text_field( $config['settings']['cart_label'] ) : 'Ir al Carrito',
 			),
 		);
 

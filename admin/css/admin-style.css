@@ -504,6 +504,97 @@ select.wom-input-select {
     color: var(--wom-text);
 }
 
+/* ===== REFACTORED INLINE STYLES ===== */
+
+.wom-icon-primary {
+    background: rgba(79, 70, 229, 0.1);
+    color: #4f46e5;
+}
+
+.wom-icon-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.wom-icon-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.wom-btn-icon-small {
+    padding: 4px 10px;
+    font-size: 11px;
+}
+
+.wom-btn-icon-small .dashicons {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+    margin-right: 4px;
+}
+
+.wom-result-message {
+    margin-top: 8px;
+    font-size: 11px;
+    padding: 6px;
+    border-radius: 3px;
+}
+
+.wom-btn-action {
+    margin-top: 10px;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.wom-table-empty {
+    text-align: center;
+    padding: 20px;
+    color: #999;
+}
+
+.wom-log-container {
+    background: #1e293b;
+    color: #f8fafc;
+    padding: 20px;
+    border-radius: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid #334155;
+}
+
+.wom-log-entry {
+    margin-bottom: 4px;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 4px;
+}
+
+.wom-log-empty {
+    color: #94a3b8;
+    text-align: center;
+    padding: 40px;
+}
+
+.wom-sync-message {
+    margin-top: 10px;
+}
+
+.wom-action-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.wom-error-inline {
+    color: #d32f2f;
+}
+
+.wom-form-row-spacing {
+    margin-bottom: 20px;
+}
+
 /* ===== BUTTON STYLES ===== */
 .wom-btn-primary {
     background: var(--wom-primary) !important;

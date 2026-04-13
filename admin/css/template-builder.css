@@ -198,6 +198,71 @@ input[type="color"] {
 	gap: 10px;
 }
 
+/* Button Styles - Handling Overflow */
+.wom-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 10px 12px;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 500;
+	transition: all 0.2s ease;
+	white-space: normal;
+	word-break: break-word;
+	overflow-wrap: break-word;
+	hyphens: auto;
+	width: 100%;
+	text-align: center;
+}
+
+.wom-btn:hover {
+	opacity: 0.9;
+	transform: translateY(-1px);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.wom-btn:active {
+	transform: translateY(0);
+}
+
+.wom-btn:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	transform: none;
+}
+
+.wom-btn-success {
+	background: #10b981;
+	color: white;
+	border-color: #059669;
+}
+
+.wom-btn-success:hover {
+	background: #059669;
+}
+
+.wom-btn-warning {
+	background: #f59e0b;
+	color: white;
+	border-color: #d97706;
+}
+
+.wom-btn-warning:hover {
+	background: #d97706;
+}
+
+.wom-btn .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+	flex-shrink: 0;
+}
+
 .wom-fieldset-colors,
 .wom-fieldset-parameters,
 .wom-fieldset-texts {

@@ -1,6 +1,19 @@
 <?php
 /**
- * Vista de configuración de Email con SMTP - VERSIÓN MEJORADA
+ * Página de Email
+ * 
+ * ¿Qué hace?
+ * - Configurar plantilla de email de matrícula
+ * - Personalizar asunto y contenido
+ * - Variables como {USER_NAME}, {COURSE_NAME}, {DATE}
+ * 
+ * ¿Qué debe funcionar?
+ * ✅ Editor WYSIWYG para HTML (TinyMCE)
+ * ✅ Campo de asunto editable
+ * ✅ Variables disponibles (insert variables)
+ * ✅ Preview del email
+ * ✅ Botón "Probar Envío" → envía a admin
+ * ✅ Botón "Guardar" → guarda plantilla
  * 
  * Características:
  * - Campos de prueba de email con input dinámico

@@ -1,11 +1,26 @@
 ﻿<?php
 /**
- * Gestión de Metadatos y Mapeo de Campos (Consolidado v3.0.8)
+ * Página de Metadatos
+ * 
+ * ¿Qué hace?
+ * - Tab 1 - MAPEO: Campos de Moodle que se sincronizan a WooCommerce
+ * - Tab 2 - VISTA EN VIVO: Seleccionar curso y ver sus metadatos en tiempo real
+ * 
+ * ¿Qué debe funcionar?
+ * Tab 1 - MAPEO DE CAMPOS:
+ * ✅ Tabla con 13 campos (checkbox + descripción + tipo)
+ * ✅ Contador: Total | Habilitados | Deshabilitados
+ * ✅ Botón "Restaurar" → reset a valores por defecto
+ * ✅ Cambios sin reload (AJAX)
+ * 
+ * Tab 2 - VISTA EN VIVO:
+ * ✅ Dropdown selector de cursos
+ * ✅ Al seleccionar → muestra preview de metadatos
+ * ✅ Muestra título + contenido HTML formateado
  */
 
 include WOO_OTEC_MOODLE_PATH . 'admin/partials/tabs-header.php';
 
-// Validar managers
 if ( empty( $metadata_manager ) ) {
 	if ( empty( $api_client ) || empty( $logger ) ) {
 		$api_client = new \Woo_OTEC_Moodle\API_Client();
@@ -14,14 +29,12 @@ if ( empty( $metadata_manager ) ) {
 	$metadata_manager = new \Woo_OTEC_Moodle\Metadata_Manager( $api_client, $logger );
 }
 
-// Obtener datos
 $all_mappings = \Woo_OTEC_Moodle\Field_Mapper::get_all_mappings();
 $stats = \Woo_OTEC_Moodle\Field_Mapper::get_stats();
 $metadata = $metadata_manager->get_available_metadata() ?: array();
 ?>
 
 <div class="wom-wrap">
-<!-- TAB NAVIGATION -->
 <div class="wom-tabs">
 	<a href="#mapeo" class="wom-tab-link active" data-tab="mapeo">
 		<span class="dashicons dashicons-admin-links"></span> Mapeo de Campos
@@ -31,7 +44,6 @@ $metadata = $metadata_manager->get_available_metadata() ?: array();
 	</a>
 </div>
 
-<!-- TAB 1: MAPEO -->
 <div id="mapeo" class="wom-tab-content active">
 	<div class="wom-container">
 		<h2><span class="dashicons dashicons-admin-links"></span> Mapeo de Campos</h2>
@@ -39,7 +51,6 @@ $metadata = $metadata_manager->get_available_metadata() ?: array();
 			Selecciona qué campos de Moodle se sincronizarán a WooCommerce
 		</p>
 
-		<!-- Stats -->
 		<div class="wom-grid wom-grid-cols-3" style="margin-bottom: 30px;">
 			<div class="wom-status-card info">
 				<div class="wom-status-card-label">Total</div>
@@ -55,7 +66,6 @@ $metadata = $metadata_manager->get_available_metadata() ?: array();
 			</div>
 		</div>
 
-		<!-- Tabla -->
 		<table class="wom-table">
 			<thead>
 				<tr>
@@ -83,7 +93,6 @@ $metadata = $metadata_manager->get_available_metadata() ?: array();
 			</tbody>
 		</table>
 
-		<!-- Acciones -->
 		<div class="wom-actions-row">
 			<button type="button" id="wom-reset-mappings" class="wom-btn wom-btn-warning">
 				<span class="dashicons dashicons-update"></span> Restaurar
@@ -93,7 +102,6 @@ $metadata = $metadata_manager->get_available_metadata() ?: array();
 	</div>
 </div>
 
-<!-- TAB 3: VISTA EN VIVO -->
 <div id="preview" class="wom-tab-content">
 	<div class="wom-container">
 		<h2><span class="dashicons dashicons-visibility"></span> Vista en Vivo</h2>
@@ -101,10 +109,9 @@ $metadata = $metadata_manager->get_available_metadata() ?: array();
 			Selecciona un curso para ver cómo aparecen sus metadatos
 		</p>
 
-		<!-- Selector de cursos -->
 		<div style="margin-bottom: 20px;">
 			<label>Curso:</label>
-			<select id="wom-course-selector" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; max-width: 300px;">
+			<select id="wom-course-selector" class="wom-input-select" style="width: 100%; max-width: 300px;">
 				<option value="">-- Selecciona un curso --</option>
 				<?php
 					$products = get_posts( array(
@@ -124,7 +131,6 @@ $metadata = $metadata_manager->get_available_metadata() ?: array();
 			</select>
 		</div>
 
-		<!-- Preview -->
 		<div id="wom-preview" style="background: #f5f5f5; padding: 20px; border-radius: 4px; border: 1px solid #ddd; display: none;">
 			<h3 id="preview-title"></h3>
 			<div id="preview-content"></div>
@@ -222,15 +228,13 @@ $metadata = $metadata_manager->get_available_metadata() ?: array();
 			const enabled = $(e.target).is(':checked') ? 1 : 0;
 			$.post(wooOtecMoodle.ajax_url, {
 				action: 'woo_otec_update_field_mapping',
-				nonce: '<?php echo wp_create_nonce('woo-otec-moodle-nonce'); ?>',
-				field_id: fieldId,
-				enabled: enabled
+				nonce: wooOtecMoodle.nonce,
+				field: fieldId,
+				enable: enabled
 			});
 		},
 
-		toggleMetadata: function(e) {
-			// Acción real se realiza al guardar
-		},
+		toggleMetadata: function(e) {},
 
 		previewCourse: function(e) {
 			const productId = $(e.target).value;
@@ -241,13 +245,18 @@ $metadata = $metadata_manager->get_available_metadata() ?: array();
 
 			$.post(wooOtecMoodle.ajax_url, {
 				action: 'wom_load_product_preview',
-				nonce: '<?php echo wp_create_nonce('woo-otec-moodle-nonce'); ?>',
+				nonce: wooOtecMoodle.nonce,
 				product_id: productId
 			}, function(response) {
 				if (response.success) {
-					$('#preview-title').text(response.data.title || 'Curso');
-					$('#preview-content').html(response.data.html || '');
+					const product = wc_get_product( productId );
+					const title = response.data.title || (typeof product !== 'undefined' ? product.name : 'Curso');
+					$('#preview-title').text(title);
+					$('#preview-content').html(response.data.html || response.data || '');
 					$('#wom-preview').show();
+				} else {
+					console.error('Error al cargar preview:', response.data);
+					$('#wom-preview').hide();
 				}
 			});
 		},
@@ -257,9 +266,14 @@ $metadata = $metadata_manager->get_available_metadata() ?: array();
 			if (!confirm('¿Restablecer a predeterminados?')) return;
 			$.post(wooOtecMoodle.ajax_url, {
 				action: 'woo_otec_reset_field_mappings',
-				nonce: '<?php echo wp_create_nonce('woo-otec-moodle-nonce'); ?>'
-			}, function() {
-				location.reload();
+				nonce: wooOtecMoodle.nonce
+			}, function(response) {
+				if (response.success) {
+					alert('Mapeos restaurados correctamente');
+					location.reload();
+				} else {
+					alert('Error al restaurar: ' + response.data);
+				}
 			});
 		}
 	};

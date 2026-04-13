@@ -1,9 +1,17 @@
 <?php
 /**
- * Vista Admin - Configuración de CRON
+ * Página de CRON (Tareas Automáticas)
  * 
- * Permite configurar el intervalo de sincronización automática
- *
+ * ¿Qué hace?
+ * - Configurar intervalo de sincronización automática
+ * - Mostrar estado y logs de ejecuciones
+ * 
+ * ¿Qué debe funcionar?
+ * ✅ Selector de intervalo (cada hora, cada día, etc.)
+ * ✅ Mostrar última ejecución (fecha/hora)
+ * ✅ Botón "Ejecutar Ahora" → ejecuta sincro manual
+ * ✅ Logs de últimas ejecuciones
+ * 
  * @version 3.0.7
  */
 
@@ -160,7 +168,6 @@ $current_interval = $cron->get_interval_hours();
                 success: (response) => {
                     if (response.success) {
                         this.showMessage('✅ Configuración guardada. CRON reprogramado para cada ' + interval + ' hora(s)', 'success');
-                        // Recargar página en 2 segundos para ver cambios
                         setTimeout(() => location.reload(), 2000);
                     } else {
                         this.showMessage('❌ Error: ' + response.data, 'error');

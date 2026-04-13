@@ -47,11 +47,11 @@ class Frontend_Renderer {
 	 * Enqueued estilos y scripts del frontend
 	 */
 	public function enqueue_frontend_assets() {
-		wp_enqueue_style( 'wom-frontend-style', WOO_OTEC_MOODLE_URL . 'frontend/css/courses.css', array(), time() );
-		wp_enqueue_style( 'wom-template-shortcodes', WOO_OTEC_MOODLE_URL . 'frontend/css/template-shortcodes.css', array(), time() );
+		wp_enqueue_style( 'wom-frontend-style', WOO_OTEC_MOODLE_URL . 'frontend/css/courses.css', array(), WOO_OTEC_MOODLE_VERSION );
+		wp_enqueue_style( 'wom-template-shortcodes', WOO_OTEC_MOODLE_URL . 'frontend/css/template-shortcodes.css', array(), WOO_OTEC_MOODLE_VERSION );
 		
 		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'wom-template-shortcodes', WOO_OTEC_MOODLE_URL . 'frontend/js/template-shortcodes.js', array( 'jquery' ), time(), true );
+		wp_enqueue_script( 'wom-template-shortcodes', WOO_OTEC_MOODLE_URL . 'frontend/js/template-shortcodes.js', array( 'jquery' ), WOO_OTEC_MOODLE_VERSION, true );
 		
 		wp_localize_script( 'wom-template-shortcodes', 'wooOtecMoodle', array(
 			'ajax_url'           => admin_url( 'admin-ajax.php' ),
