@@ -50,20 +50,20 @@ $unlinked_products = $total_products - $linked_products;
             
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
                 <div>
-                    <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 12px;">Color Primario</label>
-                    <input type="color" name="woo_otec_catalog_primary" style="width: 100%; height: 36px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" />
+                    <label for="woo_otec_catalog_primary" style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 12px;">Color Primario</label>
+                    <input type="color" id="woo_otec_catalog_primary" name="woo_otec_catalog_primary" style="width: 100%; height: 36px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" />
                 </div>
                 <div>
-                    <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 12px;">Color de Éxito</label>
-                    <input type="color" name="woo_otec_catalog_success" style="width: 100%; height: 36px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" />
+                    <label for="woo_otec_catalog_success" style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 12px;">Color de Éxito</label>
+                    <input type="color" id="woo_otec_catalog_success" name="woo_otec_catalog_success" style="width: 100%; height: 36px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" />
                 </div>
                 <div>
-                    <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 12px;">Fondo</label>
-                    <input type="color" name="woo_otec_catalog_bg" style="width: 100%; height: 36px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" />
+                    <label for="woo_otec_catalog_bg" style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 12px;">Fondo</label>
+                    <input type="color" id="woo_otec_catalog_bg" name="woo_otec_catalog_bg" style="width: 100%; height: 36px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" />
                 </div>
                 <div>
-                    <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 12px;">Texto Principal</label>
-                    <input type="color" name="woo_otec_catalog_text" style="width: 100%; height: 36px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" />
+                    <label for="woo_otec_catalog_text" style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 12px;">Texto Principal</label>
+                    <input type="color" id="woo_otec_catalog_text" name="woo_otec_catalog_text" style="width: 100%; height: 36px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;" />
                 </div>
             </div>
         </div>
@@ -72,8 +72,8 @@ $unlinked_products = $total_products - $linked_products;
         <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
             <h3 style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #1f2937;">Estados de Pedido</h3>
             
-            <label style="display: block; font-size: 12px; margin-bottom: 8px;">Estado que activa matriculación</label>
-            <select style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+            <label for="woo_otec_trigger_status" style="display: block; font-size: 12px; margin-bottom: 8px;">Estado que activa matriculación</label>
+            <select id="woo_otec_trigger_status" name="woo_otec_trigger_status" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
                 <option selected>Completado (Recomendado)</option>
                 <option>Procesando</option>
             </select>
@@ -84,12 +84,12 @@ $unlinked_products = $total_products - $linked_products;
         <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
             <h3 style="margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #1f2937;">Opciones Adicionales</h3>
             
-            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 8px;">
-                <input type="checkbox" checked disabled />
+            <label for="woo_otec_auto_linking" style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 8px;">
+                <input type="checkbox" id="woo_otec_auto_linking" name="woo_otec_auto_linking" checked disabled />
                 Vinculación automática de cursos a productos
             </label>
-            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 8px;">
-                <input type="checkbox" disabled />
+            <label for="woo_otec_unenroll_refund" style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 8px;">
+                <input type="checkbox" id="woo_otec_unenroll_refund" name="woo_otec_unenroll_refund" disabled />
                 Desenrolar al procesar reembolso
             </label>
         </div>

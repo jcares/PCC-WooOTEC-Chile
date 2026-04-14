@@ -1,0 +1,595 @@
+/**
+ * WOO-OTEC-Moodle - Product Catalogue Enhanced Styles
+ * 
+ * Estilos para:
+ * - Grid responsivo
+ * - Componentes de producto
+ * - Interactividad (cantidad, botones)
+ * - Animaciones
+ * - Estados responsivos
+ * 
+ * @version 3.0.9
+ */
+
+/* ========================================
+   CONTENEDOR PRINCIPAL
+   ======================================== */
+
+.wom-catalogue-wrapper {
+	max-width: 1400px;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+.wom-catalogue-header {
+	margin-bottom: 30px;
+	text-align: left;
+}
+
+.wom-catalogue-title {
+	font-size: 28px;
+	font-weight: 700;
+	margin: 0;
+	letter-spacing: -0.5px;
+}
+
+/* ========================================
+   GRID DE PRODUCTOS
+   ======================================== */
+
+.wom-courses-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 24px;
+	margin-top: 20px;
+}
+
+/* ========================================
+   TARJETA DE PRODUCTO
+   ======================================== */
+
+.wom-product-card {
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.wom-product-card:hover {
+	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+	transform: translateY(-2px);
+	border-color: #d1d5db;
+}
+
+.wom-product-card.wom-out-of-stock {
+	opacity: 0.65;
+	pointer-events: none;
+}
+
+.wom-product-card.wom-out-of-stock .wom-add-to-cart {
+	cursor: not-allowed;
+}
+
+/* ========================================
+   IMAGEN Y OVERLAY
+   ======================================== */
+
+.wom-product-image-wrapper {
+	position: relative;
+	width: 100%;
+	height: 220px;
+	background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.wom-product-image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wom-product-card:hover .wom-product-image {
+	transform: scale(1.08);
+}
+
+/* ========================================
+   LABELS
+   ======================================== */
+
+.wom-product-label {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	padding: 6px 14px;
+	border-radius: 4px;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	z-index: 10;
+	animation: slideInDown 0.3s ease;
+}
+
+.wom-label-sale {
+	background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+	color: #ffffff;
+	box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
+}
+
+.wom-label-out-of-stock {
+	background: #6b7280;
+	color: #ffffff;
+}
+
+@keyframes slideInDown {
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* ========================================
+   RATING STARS
+   ======================================== */
+
+.wom-product-rating {
+	position: absolute;
+	bottom: 12px;
+	left: 12px;
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(8px);
+	padding: 6px 10px;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	gap: 3px;
+	font-size: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.wom-star-filled {
+	color: #fbbf24;
+	font-size: 11px;
+}
+
+.wom-star-half {
+	color: #fbbf24;
+	font-size: 11px;
+}
+
+.wom-star-empty {
+	color: #d1d5db;
+	font-size: 11px;
+}
+
+.wom-rating-count {
+	font-size: 10px;
+	color: #6b7280;
+	margin-left: 4px;
+	font-weight: 500;
+}
+
+/* ========================================
+   CONTENIDO DEL PRODUCTO
+   ======================================== */
+
+.wom-product-content {
+	padding: 16px;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.wom-product-category {
+	color: #6366f1;
+	font-size: 10px;
+	font-weight: 700;
+	margin: 0;
+	text-transform: uppercase;
+	letter-spacing: 0.75px;
+}
+
+.wom-product-name {
+	font-size: 16px;
+	font-weight: 600;
+	margin: 0;
+	color: #1f2937;
+	line-height: 1.4;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.wom-product-description {
+	font-size: 13px;
+	color: #6b7280;
+	margin: 0;
+	line-height: 1.5;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+/* ========================================
+   PRECIO
+   ======================================== */
+
+.wom-product-price-section {
+	display: flex;
+	gap: 10px;
+	margin: 8px 0;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.wom-price {
+	font-weight: 600;
+	font-size: 14px;
+	color: #1f2937;
+}
+
+.wom-price-original {
+	text-decoration: line-through;
+	color: #9ca3af;
+	font-weight: 400;
+	font-size: 13px;
+}
+
+.wom-price-sale {
+	color: #ef4444;
+	font-size: 16px;
+	font-weight: 700;
+}
+
+/* ========================================
+   STOCK
+   ======================================== */
+
+.wom-product-stock {
+	font-size: 12px;
+	color: #10b981;
+	margin: 0;
+	font-weight: 500;
+}
+
+.wom-product-stock--low {
+	color: #f59e0b;
+}
+
+.wom-product-stock--none {
+	color: #ef4444;
+}
+
+/* ========================================
+   SELECTOR DE CANTIDAD
+   ======================================== */
+
+.wom-quantity-selector {
+	display: flex;
+	align-items: center;
+	gap: 0;
+	margin: 12px 0;
+	background: #f9fafb;
+	border: 1px solid #e5e7eb;
+	border-radius: 4px;
+	padding: 2px;
+}
+
+.wom-qty-btn {
+	background: transparent;
+	border: none;
+	color: #374151;
+	padding: 6px 10px;
+	cursor: pointer;
+	font-weight: 700;
+	font-size: 16px;
+	transition: all 0.2s ease;
+	user-select: none;
+	flex: 0 0 auto;
+}
+
+.wom-qty-btn:hover:not(:disabled) {
+	background: #f3f4f6;
+	color: #1f2937;
+}
+
+.wom-qty-btn:active:not(:disabled) {
+	transform: scale(0.95);
+}
+
+.wom-qty-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.wom-qty-input {
+	flex: 1;
+	text-align: center;
+	border: none;
+	background: transparent;
+	font-weight: 600;
+	font-size: 14px;
+	color: #1f2937;
+	min-width: 40px;
+	padding: 0 4px;
+	font-family: inherit;
+	-moz-appearance: textfield; /* Firefox */
+}
+
+.wom-qty-input::-webkit-outer-spin-button,
+.wom-qty-input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.wom-qty-input:focus {
+	outline: none;
+}
+
+/* ========================================
+   BOTONES
+   ======================================== */
+
+.wom-btn-primary {
+	width: 100%;
+	padding: 10px 12px;
+	border: none;
+	border-radius: 4px;
+	color: #ffffff;
+	font-weight: 600;
+	font-size: 14px;
+	cursor: pointer;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	position: relative;
+	overflow: hidden;
+	text-transform: none;
+}
+
+.wom-btn-primary:hover:not(:disabled) {
+	opacity: 0.9;
+	box-shadow: 0 8px 16px rgba(99, 102, 241, 0.4);
+	transform: translateY(-1px);
+}
+
+.wom-btn-primary:active:not(:disabled) {
+	transform: translateY(0);
+}
+
+.wom-btn-primary:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.wom-btn-loader {
+	display: inline-flex;
+	animation: spin 1s linear infinite;
+	font-size: 16px;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+/* ========================================
+   ESTADO VACÍO
+   ======================================== */
+
+.wom-empty-courses {
+	padding: 60px 20px;
+	text-align: center;
+	background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+	border-radius: 8px;
+	border: 1px dashed #d1d5db;
+}
+
+.wom-empty-courses p {
+	color: #6b7280;
+	font-size: 16px;
+	margin: 0;
+	font-weight: 500;
+}
+
+/* ========================================
+   NOTIFICACIONES
+   ======================================== */
+
+.wom-notification {
+	border-radius: 4px;
+	font-weight: 500;
+	border-left: 4px solid;
+}
+
+.wom-notification-success {
+	border-left-color: #10b981;
+	background-color: #d1fae5;
+	color: #065f46;
+}
+
+.wom-notification-error {
+	border-left-color: #ef4444;
+	background-color: #fee2e2;
+	color: #7f1d1d;
+}
+
+.wom-notification-info {
+	border-left-color: #3b82f6;
+	background-color: #dbeafe;
+	color: #0c4a6e;
+}
+
+/* ========================================
+   RESPONSIVE - TABLET
+   ======================================== */
+
+@media (max-width: 768px) {
+	.wom-courses-grid {
+		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+		gap: 16px;
+	}
+
+	.wom-product-image-wrapper {
+		height: 200px;
+	}
+
+	.wom-product-name {
+		font-size: 15px;
+	}
+
+	.wom-catalogue-title {
+		font-size: 24px;
+	}
+
+	.wom-product-content {
+		padding: 12px;
+	}
+
+	.wom-quantity-selector {
+		margin: 10px 0;
+	}
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE
+   ======================================== */
+
+@media (max-width: 480px) {
+	.wom-catalogue-wrapper {
+		padding: 12px;
+	}
+
+	.wom-courses-grid {
+		grid-template-columns: 1fr;
+		gap: 12px;
+	}
+
+	.wom-catalogue-title {
+		font-size: 20px;
+		margin-bottom: 20px;
+	}
+
+	.wom-product-image-wrapper {
+		height: 180px;
+	}
+
+	.wom-product-name {
+		font-size: 14px;
+	}
+
+	.wom-product-description {
+		font-size: 12px;
+	}
+
+	.wom-price {
+		font-size: 13px;
+	}
+
+	.wom-product-content {
+		gap: 6px;
+	}
+
+	.wom-btn-primary {
+		padding: 8px 10px;
+		font-size: 13px;
+	}
+
+	.wom-quantity-selector {
+		padding: 1px;
+	}
+
+	.wom-qty-btn {
+		padding: 5px 8px;
+	}
+
+	.wom-product-rating {
+		font-size: 10px;
+	}
+
+	.wom-product-label {
+		font-size: 9px;
+		padding: 4px 8px;
+	}
+}
+
+/* ========================================
+   DARK MODE (opcional)
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+	.wom-product-card {
+		background: #1f2937;
+		border-color: #374151;
+	}
+
+	.wom-product-name {
+		color: #f9fafb;
+	}
+
+	.wom-product-category {
+		color: #93c5fd;
+	}
+
+	.wom-product-description {
+		color: #d1d5db;
+	}
+
+	.wom-qty-btn {
+		color: #e5e7eb;
+	}
+
+	.wom-qty-btn:hover:not(:disabled) {
+		background: #374151;
+		color: #f9fafb;
+	}
+
+	.wom-quantity-selector {
+		background: #374151;
+		border-color: #4b5563;
+	}
+
+	.wom-empty-courses {
+		background: #1f2937;
+		border-color: #374151;
+	}
+
+	.wom-empty-courses p {
+		color: #d1d5db;
+	}
+}
+
+/* ========================================
+   IMPRESIÓN
+   ======================================== */
+
+@media print {
+	.wom-quantity-selector,
+	.wom-btn-primary,
+	.wom-product-label {
+		display: none;
+	}
+
+	.wom-product-card {
+		page-break-inside: avoid;
+		box-shadow: none;
+	}
+}

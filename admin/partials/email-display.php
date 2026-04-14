@@ -137,7 +137,7 @@ wp_enqueue_media();
             <h3><span class="dashicons dashicons-admin-network"></span> Configuración SMTP</h3>
             
             <div class="wom-form-group">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <label for="woo_otec_email_use_smtp" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                     <input 
                         type="checkbox" 
                         id="woo_otec_email_use_smtp"

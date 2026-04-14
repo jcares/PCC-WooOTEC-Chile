@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Vista de Configuración General
  * 
@@ -80,8 +80,8 @@ $sso_status = \Woo_OTEC_Moodle\SSO_Manager::get_status();
 				</div>
 
 				<div class="wom-checkbox-group">
-					<label>
-						<input type="checkbox" name="woo_otec_moodle_auto_sync" value="yes"
+				<label for="woo_otec_moodle_auto_sync">
+					<input type="checkbox" id="woo_otec_moodle_auto_sync" name="woo_otec_moodle_auto_sync" value="yes"
 							   <?php checked( $auto_sync, 'yes' ); ?>
 							   class="wom-checkbox">
 						Habilitar auto-matrícula al comprar
@@ -141,7 +141,7 @@ $sso_status = \Woo_OTEC_Moodle\SSO_Manager::get_status();
 				</p>
 			</div>
 
-			<label class="wom-checkbox-group">
+			<label for="sso_enabled" class="wom-checkbox-group">
 				<input type="checkbox" id="sso_enabled" name="sso_enabled" value="1"
 					   <?php checked( $sso_status['enabled'] ); ?>
 					   class="wom-checkbox">
@@ -338,7 +338,7 @@ $sso_status = \Woo_OTEC_Moodle\SSO_Manager::get_status();
 				</p>
 			</div>
 
-			<label class="wom-checkbox-group">
+			<label for="sso_enabled" class="wom-checkbox-group">
 				<input type="checkbox" id="sso_enabled" name="sso_enabled" value="1"
 					   <?php checked( $sso_status['enabled'] ); ?>
 					   class="wom-checkbox">
@@ -469,3 +469,4 @@ $sso_status = \Woo_OTEC_Moodle\SSO_Manager::get_status();
 </div>
 
 </div> <!-- Close wom-wrap -->
+

@@ -68,7 +68,7 @@ class Preview_Generator {
 				return '<p>Template no reconocido</p>';
 		}
 	}
-
+	
 	/**
 	 * Genera preview de catálogo de productos
 	 *
@@ -76,7 +76,13 @@ class Preview_Generator {
 	 * @return string HTML
 	 */
 	private function generate_catalogue_preview( $config ) {
-		$samples = $this->get_sample_products( 3 );
+		// Intentar obtener productos reales de WooCommerce
+		$samples = $this->get_real_products( 3 );
+		
+		// Si no hay productos, usar muestras
+		if ( empty( $samples ) ) {
+			$samples = $this->get_sample_products( 3 );
+		}
 
 		$html = '<div class="wom-preview-container">';
 		$html .= '<div class="wom-courses-grid">';
@@ -326,6 +332,41 @@ class Preview_Generator {
 	}
 
 	/**
+	 * Obtiene productos reales de WooCommerce para la preview
+	 *
+	 * @param int $limit Cantidad máxima de productos
+	 * @return array Array de productos
+	 */
+	private function get_real_products( $limit = 3 ) {
+		$products = wc_get_products( array(
+			'limit' => $limit,
+			'status' => 'publish',
+			'orderby' => 'date',
+			'order' => 'DESC',
+		) );
+
+		if ( empty( $products ) ) {
+			return array();
+		}
+
+		$product_data = array();
+
+		foreach ( $products as $product ) {
+			$categories = wp_get_post_terms( $product->get_id(), 'product_cat', array( 'fields' => 'names' ) );
+			
+			$product_data[] = array(
+				'name' => $product->get_name(),
+				'description' => $product->get_short_description() ?: wp_trim_words( $product->get_description(), 20 ),
+				'category' => ! empty( $categories ) ? $categories[0] : 'Sin categoría',
+				'price' => $product->get_price(),
+				'image' => wp_get_attachment_url( $product->get_image_id() ) ?: includes_url( 'images/media/default.png' ),
+			);
+		}
+
+		return $product_data;
+	}
+
+	/**
 	 * Obtiene un producto de ejemplo
 	 *
 	 * @return array
@@ -351,3 +392,4 @@ class Preview_Generator {
 		return ! empty( $categories ) ? $categories[0] : 'Sin categoría';
 	}
 }
+

@@ -1,1 +1,41 @@
 [2026-04-12 04:33:14] [SUCCESS] [User: cipresalto] CRON configurado para cada 6 hora(s)
+[2026-04-13 10:12:03] [INFO] [User: cipresalto] Iniciando sincronización de cursos...
+[2026-04-13 10:12:05] [SUCCESS] [User: cipresalto] Curso creado: Manejo de Conflictos (ID: 2)
+[2026-04-13 10:12:05] [SUCCESS] [User: cipresalto] Curso creado: Manejo de Conflictos Laborales (ID: 3)
+[2026-04-13 10:12:05] [SUCCESS] [User: cipresalto] Curso creado: Manejo de Plaguicidas (ID: 4)
+[2026-04-13 10:12:05] [INFO] [User: cipresalto] Sincronización completada exitosamente. Categorías: 2 procesadas. Cursos: 3 creados, 0 actualizados. Errores: 0
+[2026-04-13 10:12:18] [INFO] [User: cipresalto] Metadatos disponibles generados y cacheados
+[2026-04-14 05:24:40] [SUCCESS] [User: cipresalto] Campo 'fullname' deshabilitado en mapeo
+[2026-04-14 05:25:01] [SUCCESS] [User: cipresalto] Campo 'sence_code' deshabilitado en mapeo
+[2026-04-14 05:25:14] [SUCCESS] [User: cipresalto] Campo 'summary' deshabilitado en mapeo
+[2026-04-14 05:25:15] [SUCCESS] [User: cipresalto] Campo 'shortname' deshabilitado en mapeo
+[2026-04-14 05:25:28] [SUCCESS] [User: cipresalto] Campo 'total_hours' deshabilitado en mapeo
+[2026-04-14 05:25:42] [SUCCESS] [User: cipresalto] Campo 'startdate' deshabilitado en mapeo
+[2026-04-14 05:25:42] [SUCCESS] [User: cipresalto] Campo 'enddate' deshabilitado en mapeo
+[2026-04-14 05:25:43] [SUCCESS] [User: cipresalto] Campo 'teacher' deshabilitado en mapeo
+[2026-04-14 05:25:44] [SUCCESS] [User: cipresalto] Campo 'duration' deshabilitado en mapeo
+[2026-04-14 05:25:44] [SUCCESS] [User: cipresalto] Campo 'modality' deshabilitado en mapeo
+[2026-04-14 07:22:14] [INFO] [User: cipresalto] Iniciando sincronización de cursos...
+[2026-04-14 07:22:15] [SUCCESS] [User: cipresalto] Curso creado: Resolución de Conflictos (ID: 2)
+[2026-04-14 07:22:15] [SUCCESS] [User: cipresalto] Curso creado: resss (ID: 3)
+[2026-04-14 07:22:15] [SUCCESS] [User: cipresalto] Curso creado: Gestión de Conflictos Laborales (ID: 4)
+[2026-04-14 07:22:15] [SUCCESS] [User: cipresalto] Curso creado: Comunicación Efectiva en el Trabajo (ID: 5)
+[2026-04-14 07:22:15] [SUCCESS] [User: cipresalto] Curso creado: Liderazgo y Gestión de Equipos (ID: 6)
+[2026-04-14 07:22:15] [SUCCESS] [User: cipresalto] Curso creado: Gestión del Tiempo y Productividad (ID: 7)
+[2026-04-14 07:22:15] [SUCCESS] [User: cipresalto] Curso creado: Excel para Administración (ID: 8)
+[2026-04-14 07:22:15] [SUCCESS] [User: cipresalto] Curso creado: Prevención de Riesgos Laborales (ID: 9)
+[2026-04-14 07:22:16] [SUCCESS] [User: cipresalto] Curso creado: Marketing Digital para Empresas (ID: 10)
+[2026-04-14 07:22:16] [SUCCESS] [User: cipresalto] Curso creado: Ventas Profesionales (ID: 11)
+[2026-04-14 07:22:16] [SUCCESS] [User: cipresalto] Curso creado: Atención al Cliente (ID: 12)
+[2026-04-14 07:22:16] [SUCCESS] [User: cipresalto] Curso creado: Trabajo en Equipo (ID: 13)
+[2026-04-14 07:22:16] [SUCCESS] [User: cipresalto] Curso creado: Inteligencia Emocional (ID: 14)
+[2026-04-14 07:22:16] [SUCCESS] [User: cipresalto] Curso creado: Gestión de Proyectos (ID: 15)
+[2026-04-14 07:22:16] [SUCCESS] [User: cipresalto] Curso creado: Logística y Abastecimiento (ID: 16)
+[2026-04-14 07:22:16] [SUCCESS] [User: cipresalto] Curso creado: Gestión de Recursos Humanos (ID: 17)
+[2026-04-14 07:22:16] [SUCCESS] [User: cipresalto] Curso creado: Contabilidad Básica (ID: 18)
+[2026-04-14 07:22:16] [INFO] [User: cipresalto] Sincronización completada exitosamente. Categorías: 2 procesadas. Cursos: 17 creados, 0 actualizados. Errores: 0
+[2026-04-14 09:32:00] [SUCCESS] [User: cipresalto] Campo 'fullname' habilitado en mapeo
+[2026-04-14 09:32:07] [SUCCESS] [User: cipresalto] Campo 'startdate' habilitado en mapeo
+[2026-04-14 09:32:14] [SUCCESS] [User: cipresalto] Campo 'teacher' habilitado en mapeo
+[2026-04-14 09:32:20] [SUCCESS] [User: cipresalto] Campo 'modality' habilitado en mapeo
+[2026-04-14 10:32:36] [INFO] [User: cipresalto] Metadatos disponibles generados y cacheados

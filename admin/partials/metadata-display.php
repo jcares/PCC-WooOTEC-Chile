@@ -1,23 +1,11 @@
 ﻿<?php
 /**
- * Página de Metadatos
- * 
- * ¿Qué hace?
- * - Tab 1 - MAPEO: Campos de Moodle que se sincronizan a WooCommerce
- * - Tab 2 - VISTA EN VIVO: Seleccionar curso y ver sus metadatos en tiempo real
- * 
- * ¿Qué debe funcionar?
- * Tab 1 - MAPEO DE CAMPOS:
- * ✅ Tabla con 13 campos (checkbox + descripción + tipo)
- * ✅ Contador: Total | Habilitados | Deshabilitados
- * ✅ Botón "Restaurar" → reset a valores por defecto
- * ✅ Cambios sin reload (AJAX)
- * 
- * Tab 2 - VISTA EN VIVO:
- * ✅ Dropdown selector de cursos
- * ✅ Al seleccionar → muestra preview de metadatos
- * ✅ Muestra título + contenido HTML formateado
+ * Página de Metadatos - Mapeo de Campos y Vista Previa
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 include WOO_OTEC_MOODLE_PATH . 'admin/partials/tabs-header.php';
 
@@ -31,254 +19,222 @@ if ( empty( $metadata_manager ) ) {
 
 $all_mappings = \Woo_OTEC_Moodle\Field_Mapper::get_all_mappings();
 $stats = \Woo_OTEC_Moodle\Field_Mapper::get_stats();
-$metadata = $metadata_manager->get_available_metadata() ?: array();
 ?>
 
-<div class="wom-wrap">
-<div class="wom-tabs">
-	<a href="#mapeo" class="wom-tab-link active" data-tab="mapeo">
-		<span class="dashicons dashicons-admin-links"></span> Mapeo de Campos
-	</a>
-	<a href="#preview" class="wom-tab-link" data-tab="preview">
-		<span class="dashicons dashicons-visibility"></span> Vista en Vivo
-	</a>
-</div>
+<div class="wom-container" style="max-width: 900px; margin-top: 24px;">
 
-<div id="mapeo" class="wom-tab-content active">
-	<div class="wom-container">
-		<h2><span class="dashicons dashicons-admin-links"></span> Mapeo de Campos</h2>
-		<p style="color: var(--wom-text-muted); margin: 0 0 20px;">
-			Selecciona qué campos de Moodle se sincronizarán a WooCommerce
-		</p>
+	<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
 
-		<div class="wom-grid wom-grid-cols-3" style="margin-bottom: 30px;">
-			<div class="wom-status-card info">
-				<div class="wom-status-card-label">Total</div>
-				<div class="wom-status-card-value"><?php echo count($all_mappings); ?></div>
+		<!-- Sección 1: Mapeo de Campos -->
+		<div>
+			<h2 style="margin-top: 0; font-size: 18px; display: flex; align-items: center; gap: 8px;">
+				<span class="dashicons dashicons-admin-links"></span>
+				Mapeo de Campos
+			</h2>
+			<p style="color: #666; font-size: 13px; margin: 0 0 20px;">
+				Campos de Moodle que se sincronizan a WooCommerce
+			</p>
+
+			<!-- Estadísticas -->
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
+				<div style="background: #f0f9ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 6px; text-align: center;">
+					<div style="font-weight: 600; color: #0369a1; font-size: 20px;">
+						<?php echo count($all_mappings); ?>
+					</div>
+					<div style="font-size: 12px; color: #0c4a6e;">Total</div>
+				</div>
+				<div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 6px; text-align: center;">
+					<div style="font-weight: 600; color: #15803d; font-size: 20px;">
+						<?php echo $stats['enabled'] ?? 0; ?>
+					</div>
+					<div style="font-size: 12px; color: #15803d;">Habilitados</div>
+				</div>
 			</div>
-			<div class="wom-status-card success">
-				<div class="wom-status-card-label">Habilitados</div>
-				<div class="wom-status-card-value"><?php echo $stats['enabled'] ?? 0; ?></div>
-			</div>
-			<div class="wom-status-card warning">
-				<div class="wom-status-card-label">Deshabilitados</div>
-				<div class="wom-status-card-value"><?php echo $stats['disabled'] ?? 0; ?></div>
-			</div>
-		</div>
 
-		<table class="wom-table">
-			<thead>
-				<tr>
-					<th style="width: 40px;">Activo</th>
-					<th>Campo</th>
-					<th>Descripción</th>
-					<th>Clave WC</th>
-					<th>Tipo</th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php foreach ($all_mappings as $field_id => $mapping) : ?>
-				<tr>
-					<td>
-						<input type="checkbox" class="wom-toggle-field" 
-							data-field-id="<?php echo esc_attr($field_id); ?>" 
-							<?php checked($mapping['enabled'] ?? true); ?>>
-					</td>
-					<td><strong><?php echo esc_html($field_id); ?></strong></td>
-					<td><small><?php echo esc_html($mapping['description'] ?? ''); ?></small></td>
-					<td><code><?php echo esc_html($mapping['wc_key'] ?? ''); ?></code></td>
-					<td><span class="wom-badge"><?php echo esc_html($mapping['type'] ?? ''); ?></span></td>
-				</tr>
-				<?php endforeach; ?>
-			</tbody>
-		</table>
+			<!-- Tabla de Campos -->
+			<div style="max-height: 400px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 6px;">
+				<table style="width: 100%; border-collapse: collapse; font-size: 13px; margin: 0;">
+					<thead>
+						<tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+							<th style="padding: 10px; text-align: left; width: 40px;">Activo</th>
+							<th style="padding: 10px; text-align: left;">Campo</th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ($all_mappings as $field_id => $mapping) : ?>
+						<tr style="border-bottom: 1px solid #f3f4f6;">
+							<td style="padding: 10px; text-align: center;">
+								<input type="checkbox" class="wom-toggle-field" 
+									data-field-id="<?php echo esc_attr($field_id); ?>" 
+									style="cursor: pointer;"
+									<?php checked($mapping['enabled'] ?? true); ?>>
+							</td>
+							<td style="padding: 10px;">
+								<strong><?php echo esc_html($field_id); ?></strong>
+								<?php if (!empty($mapping['description'])) : ?>
+									<div style="font-size: 12px; color: #666; margin-top: 2px;">
+										<?php echo esc_html($mapping['description']); ?>
+									</div>
+								<?php endif; ?>
+							</td>
+						</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			</div>
 
-		<div class="wom-actions-row">
-			<button type="button" id="wom-reset-mappings" class="wom-btn wom-btn-warning">
-				<span class="dashicons dashicons-update"></span> Restaurar
+			<button type="button" id="wom-reset-mappings" style="margin-top: 12px; padding: 8px 16px; background: #f97316; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+				<span class="dashicons dashicons-update" style="margin-right: 4px;"></span> Restaurar Predeterminados
 			</button>
-			<div id="mapeo-result-message"></div>
 		</div>
-	</div>
-</div>
 
-<div id="preview" class="wom-tab-content">
-	<div class="wom-container">
-		<h2><span class="dashicons dashicons-visibility"></span> Vista en Vivo</h2>
-		<p style="color: var(--wom-text-muted); margin: 0 0 20px;">
-			Selecciona un curso para ver cómo aparecen sus metadatos
-		</p>
+		<!-- Sección 2: Vista Previa -->
+		<div>
+			<h2 style="margin-top: 0; font-size: 18px; display: flex; align-items: center; gap: 8px;">
+				<span class="dashicons dashicons-visibility"></span>
+				Vista en Vivo
+			</h2>
+			<p style="color: #666; font-size: 13px; margin: 0 0 20px;">
+				Selecciona un curso para ver sus metadatos
+			</p>
 
-		<div style="margin-bottom: 20px;">
-			<label>Curso:</label>
-			<select id="wom-course-selector" class="wom-input-select" style="width: 100%; max-width: 300px;">
-				<option value="">-- Selecciona un curso --</option>
+			<div style="margin-bottom: 20px;">
+				<label for="wom-course-selector" style="display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px;">
+					Curso:
+				</label>
 				<?php
 					$products = get_posts( array(
 						'post_type'     => 'product',
-						'meta_key'      => '_moodle_course_id',
 						'numberposts'   => -1,
 						'orderby'       => 'post_title',
 						'order'         => 'ASC',
 					) );
-					foreach ( $products as $product ) :
-						$moodle_id = get_post_meta( $product->ID, '_moodle_course_id', true );
 				?>
-					<option value="<?php echo esc_attr( $product->ID ); ?>" data-moodle-id="<?php echo esc_attr( $moodle_id ); ?>">
-						<?php echo esc_html( $product->post_title ); ?> (ID: <?php echo esc_html( $moodle_id ); ?>)
-					</option>
-				<?php endforeach; ?>
-			</select>
+				<?php if ( ! empty( $products ) ) : ?>
+					<select id="wom-course-selector" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+						<option value="">-- Selecciona un curso --</option>
+						<?php foreach ( $products as $product ) : ?>
+							<option value="<?php echo esc_attr( $product->ID ); ?>">
+								<?php echo esc_html( $product->post_title ); ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+				<?php else : ?>
+					<div style="padding: 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; color: #991b1b; font-size: 13px;">
+						<span class="dashicons dashicons-warning" style="margin-right: 4px;"></span>
+						No hay productos disponibles aún
+					</div>
+				<?php endif; ?>
+			</div>
+
+			<div id="wom-preview" style="background: #f9fafb; padding: 16px; border-radius: 6px; border: 1px solid #e5e7eb; display: none; max-height: 350px; overflow-y: auto;">
+				<h3 id="preview-title" style="margin: 0 0 12px; font-size: 14px; font-weight: 600;"></h3>
+				<div id="preview-content" style="font-size: 13px; color: #333; line-height: 1.5;"></div>
+			</div>
+
+			<div style="background: #f0f9ff; border: 1px solid #bfdbfe; padding: 12px; border-radius: 6px; margin-top: 20px; font-size: 12px; color: #0c4a6e;">
+				<span class="dashicons dashicons-info" style="margin-right: 4px;"></span>
+				Los cambios se guardan automáticamente
+			</div>
 		</div>
 
-		<div id="wom-preview" style="background: #f5f5f5; padding: 20px; border-radius: 4px; border: 1px solid #ddd; display: none;">
-			<h3 id="preview-title"></h3>
-			<div id="preview-content"></div>
-		</div>
 	</div>
-</div>
 
-<!-- Info -->
-<div style="margin-top: 30px;">
-	<div class="wom-alert wom-alert-info">
-		<span class="dashicons dashicons-info wom-alert-icon"></span>
-		<div class="wom-alert-content">
-			<div class="wom-alert-title">Sincronización</div>
-			<p class="wom-alert-message" style="margin: 0;">
-				Los cambios se guardan automáticamente en el servidor.
-			</p>
-		</div>
-	</div>
 </div>
-</div>
-
-<style>
-.wom-metadata-box {
-	background: var(--wom-white);
-	border: 1px solid var(--wom-border);
-	padding: 16px;
-	border-radius: var(--wom-radius-sm);
-	transition: all var(--wom-transition);
-}
-.wom-metadata-box:hover {
-	border-color: var(--wom-primary);
-	box-shadow: var(--wom-shadow-md);
-}
-.wom-badge {
-	display: inline-block;
-	background: var(--wom-primary-light);
-	color: var(--wom-primary);
-	padding: 2px 8px;
-	border-radius: 12px;
-	font-size: 11px;
-	font-weight: 600;
-}
-.wom-tabs {
-	display: flex;
-	gap: 12px;
-	margin: 0 0 24px;
-	border-bottom: 2px solid var(--wom-border);
-}
-.wom-tab-link {
-	padding: 12px 16px;
-	text-decoration: none;
-	color: var(--wom-text-muted);
-	border-bottom: 3px solid transparent;
-	transition: all var(--wom-transition);
-	cursor: pointer;
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-}
-.wom-tab-link.active {
-	color: var(--wom-primary);
-	border-bottom-color: var(--wom-primary);
-}
-.wom-tab-content {
-	display: none;
-}
-.wom-tab-content.active {
-	display: block;
-}
-</style>
 
 <script>
 (function($) {
 	'use strict';
 
-	const Tab = {
+	const MetadataPage = {
 		init: function() {
-			$(document).on('click', '.wom-tab-link', this.switch.bind(this));
+			console.log('🔧 MetadataPage inicializando...');
+			console.log('wooOtecMoodle:', typeof wooOtecMoodle !== 'undefined' ? wooOtecMoodle : 'NO DISPONIBLE');
+			
 			$(document).on('change', '.wom-toggle-field', this.toggleField.bind(this));
 			$(document).on('change', '#wom-course-selector', this.previewCourse.bind(this));
 			$(document).on('click', '#wom-reset-mappings', this.resetMappings.bind(this));
 		},
 
-		switch: function(e) {
-			e.preventDefault();
-			const tab = $(e.currentTarget).data('tab');
-			$('.wom-tab-link').removeClass('active');
-			$(e.currentTarget).addClass('active');
-			$('.wom-tab-content').removeClass('active');
-			$('#' + tab).addClass('active');
-		},
-
 		toggleField: function(e) {
 			const fieldId = $(e.target).data('field-id');
 			const enabled = $(e.target).is(':checked') ? 1 : 0;
+			console.log('📝 Guardando campo:', fieldId, 'enabled:', enabled);
 			$.post(wooOtecMoodle.ajax_url, {
 				action: 'woo_otec_update_field_mapping',
 				nonce: wooOtecMoodle.nonce,
 				field: fieldId,
 				enable: enabled
+			}, function(response) {
+				console.log('✅ Campo guardado:', response);
+			}).fail(function(error) {
+				console.error('❌ Error al guardar campo:', error);
 			});
 		},
 
-		toggleMetadata: function(e) {},
-
 		previewCourse: function(e) {
 			const productId = $(e.target).value;
+			console.log('👀 Seleccionado producto ID:', productId);
+			
 			if (!productId) {
 				$('#wom-preview').hide();
+				console.log('ℹ️ Producto vacío, ocultando preview');
 				return;
 			}
 
+			console.log('📡 Enviando AJAX a:', wooOtecMoodle.ajax_url);
+			
 			$.post(wooOtecMoodle.ajax_url, {
 				action: 'wom_load_product_preview',
 				nonce: wooOtecMoodle.nonce,
 				product_id: productId
 			}, function(response) {
+				console.log('✅ Respuesta del servidor:', response);
 				if (response.success) {
-					const product = wc_get_product( productId );
-					const title = response.data.title || (typeof product !== 'undefined' ? product.name : 'Curso');
-					$('#preview-title').text(title);
-					$('#preview-content').html(response.data.html || response.data || '');
+					const data = response.data || {};
+					console.log('📋 Datos recibidos - título:', data.title, 'html length:', data.html ? data.html.length : 0);
+					$('#preview-title').text(data.title || 'Curso');
+					$('#preview-content').html(data.html || '');
 					$('#wom-preview').show();
+					console.log('✨ Preview mostrado');
 				} else {
-					console.error('Error al cargar preview:', response.data);
+					console.error('❌ Error en respuesta:', response.data);
 					$('#wom-preview').hide();
 				}
+			}).fail(function(xhr, status, error) {
+				console.error('❌ Error AJAX:', {
+					status: status,
+					error: error,
+					statusCode: xhr.status,
+					response: xhr.responseText
+				});
+				alert('Error al cargar preview: ' + error);
 			});
 		},
 
 		resetMappings: function(e) {
 			e.preventDefault();
-			if (!confirm('¿Restablecer a predeterminados?')) return;
+			if (!confirm('¿Restablecer todos los mapeos a predeterminados?')) return;
+			console.log('🔄 Reseteando mapeos...');
 			$.post(wooOtecMoodle.ajax_url, {
 				action: 'woo_otec_reset_field_mappings',
 				nonce: wooOtecMoodle.nonce
 			}, function(response) {
 				if (response.success) {
+					console.log('✅ Mapeos restaurados');
 					alert('Mapeos restaurados correctamente');
 					location.reload();
 				} else {
-					alert('Error al restaurar: ' + response.data);
+					console.error('❌ Error:', response.data);
+					alert('Error: ' + response.data);
 				}
+			}).fail(function(error) {
+				console.error('❌ Error AJAX:', error);
 			});
 		}
 	};
 
-	Tab.init();
+	MetadataPage.init();
 
 })(jQuery);
 </script>

@@ -11,10 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once plugin_dir_path( __FILE__ ) . 'class-template-manager.php';
-require_once plugin_dir_path( __FILE__ ) . 'class-template-customizer.php';
-require_once plugin_dir_path( __FILE__ ) . 'class-preview-generator.php';
-
 class Admin_Settings {
 
 	/**
@@ -48,23 +44,31 @@ class Admin_Settings {
 	private $preview_generator;
 
 	/**
-	 * Gestor de Mapeo de Campos.
-	 */
-	private $field_mapper;
-
-	/**
 	 * Constructor.
+	 * 
+	 * @param API_Client $api_client Cliente de API de Moodle.
+	 * @param Logger $logger Gestor de logs.
+	 * @param ?Metadata_Manager $metadata_manager Gestor de metadatos (opcional).
+	 * @param ?Template_Manager $template_manager Gestor de plantillas (opcional).
+	 * @param ?Template_Customizer $template_customizer Personalizador de plantillas (opcional).
+	 * @param ?Preview_Generator $preview_generator Generador de previews (opcional).
 	 */
-	public function __construct( $api_client, $logger, $metadata_manager = null, $template_manager = null, $template_customizer = null, $preview_generator = null ) {
+	public function __construct( 
+		API_Client $api_client, 
+		Logger $logger, 
+		?Metadata_Manager $metadata_manager = null, 
+		?Template_Manager $template_manager = null, 
+		?Template_Customizer $template_customizer = null, 
+		?Preview_Generator $preview_generator = null 
+	) {
 		$this->api_client       = $api_client;
 		$this->logger           = $logger;
 		$this->metadata_manager = $metadata_manager;
 
-		// Instanciar Template Managers
-		$this->template_manager   = $template_manager ?: new \Woo_OTEC_Moodle\Template_Manager();
-		$this->template_customizer = $template_customizer ?: new \Woo_OTEC_Moodle\Template_Customizer( $this->template_manager );
-		$this->preview_generator   = $preview_generator ?: new \Woo_OTEC_Moodle\Preview_Generator( $this->template_manager );
-		$this->field_mapper        = new \Woo_OTEC_Moodle\Field_Mapper();
+		// Inicializar Template Managers con lazy loading si no se proporcionan
+		$this->template_manager   = $template_manager ?? new Template_Manager();
+		$this->template_customizer = $template_customizer ?? new Template_Customizer( $this->template_manager );
+		$this->preview_generator   = $preview_generator ?? new Preview_Generator( $this->template_manager );
 
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
@@ -267,65 +271,77 @@ class Admin_Settings {
 	}
 
 	public function ajax_load_product_preview() {
-		check_ajax_referer( 'woo-otec-moodle-nonce', 'nonce' );
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( 'No autorizado' );
-		}
+		try {
+			// Validar nonce
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'woo-otec-moodle-nonce' ) ) {
+				wp_send_json_error( 'Verificación de seguridad fallida' );
+				die();
+			}
 
-		$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0;
+			// Verificar permisos
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( 'No autorizado' );
+				die();
+			}
 
-		if ( ! $product_id ) {
-			wp_send_json_error( 'ID de producto requerido' );
-		}
+			// Obtener ID del producto
+			$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0;
 
-		$product = wc_get_product( $product_id );
-		if ( ! $product ) {
-			wp_send_json_error( 'Producto no encontrado' );
-		}
+			if ( ! $product_id ) {
+				wp_send_json_error( 'ID de producto requerido' );
+				die();
+			}
 
-		// Obtener configuración del plugin
-		$config = get_option( 'wom_template_config', array() );
-		if ( empty( $config ) ) {
-			$config = array(
-				'settings' => array(
-					'show_price'         => true,
-					'show_category'      => true,
-					'show_meta'          => true,
-					'button_text_enroll' => 'Matricularme',
-					'default_price'      => '0',
-				),
-			);
-		}
+			// Verificar que el producto existe
+			$product = wc_get_product( $product_id );
+			if ( ! $product ) {
+				wp_send_json_error( 'Producto no encontrado' );
+				die();
+			}
 
-		// Usar output buffering para capturar el HTML de la plantilla
-		ob_start();
-		
-		// Variables disponibles para la template
-		$product_obj = get_post( $product_id );
-		
-		// Incluir plantilla personalizada
-		$template_path = WOO_OTEC_MOODLE_PATH . 'templates/template-sample-product.php';
-		if ( file_exists( $template_path ) ) {
-			$product = $product_obj;
-			include $template_path;
-		} else {
-			// Fallback: generar HTML simple si la plantilla no existe
+			// Generar preview HTML
+			ob_start();
+			
 			?>
-			<div style="padding: 20px;">
-				<h3><?php echo esc_html( $product->get_name() ); ?></h3>
-				<p><strong>Precio:</strong> <?php echo wp_kses_post( $product->get_price_html() ); ?></p>
-				<p><?php echo wp_kses_post( wp_trim_words( $product->get_description(), 50 ) ); ?></p>
+			<div style="background: #fff; padding: 16px; border-radius: 4px;">
+				<h3 style="margin: 0 0 12px; font-weight: 600;"><?php echo esc_html( $product->get_name() ); ?></h3>
+				
+				<?php if ( $product->get_price() ) : ?>
+					<p style="margin: 0 0 12px; font-weight: 500;">
+						<strong>Precio:</strong> <?php echo wp_kses_post( $product->get_price_html() ); ?>
+					</p>
+				<?php endif; ?>
+
+				<?php if ( $product->get_description() ) : ?>
+					<p style="margin: 0 0 12px; color: #666; line-height: 1.5;">
+						<?php echo wp_kses_post( wp_trim_words( $product->get_description(), 50 ) ); ?>
+					</p>
+				<?php endif; ?>
+
+				<?php 
+					$moodle_id = get_post_meta( $product_id, '_moodle_course_id', true );
+					if ( $moodle_id ) : 
+				?>
+					<p style="margin: 0; font-size: 12px; color: #999;">
+						<strong>ID Moodle:</strong> <?php echo esc_html( $moodle_id ); ?>
+					</p>
+				<?php endif; ?>
 			</div>
 			<?php
-		}
-		
-		$preview_html = ob_get_clean();
 
-		// Retornar objeto con title y html
-		wp_send_json_success( array(
-			'title' => $product->get_name(),
-			'html'  => $preview_html
-		) );
+			$preview_html = ob_get_clean();
+
+			// Responder con JSON
+			wp_send_json_success( array(
+				'title' => $product->get_name(),
+				'html'  => $preview_html
+			) );
+			die();
+
+		} catch ( Exception $e ) {
+			wp_send_json_error( 'Error: ' . $e->getMessage() );
+			die();
+		}
 	}
 
 	/**
@@ -337,7 +353,7 @@ class Admin_Settings {
 			wp_send_json_error( 'No autorizado' );
 		}
 
-		$metadata = isset( $_POST['metadata'] ) ? json_decode( sanitize_text_field( $_POST['metadata'] ), true ) : array();
+		$metadata = isset( $_POST['metadata'] ) ? json_decode( wp_unslash( $_POST['metadata'] ), true ) : array();
 
 		if ( ! is_array( $metadata ) ) {
 			wp_send_json_error( 'Formato inválido' );
@@ -458,144 +474,6 @@ class Admin_Settings {
 	}
 
 	/**
-	 * AJAX Handler para guardar configuración de template con metatags
-	 */
-	public function ajax_save_template_config_old() {
-		check_ajax_referer( 'woo-otec-moodle-nonce', 'nonce' );
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( 'No autorizado' );
-		}
-
-		$template_id = isset( $_POST['template_id'] ) ? sanitize_text_field( $_POST['template_id'] ) : '';
-		$config = isset( $_POST['config'] ) ? json_decode( stripslashes( $_POST['config'] ), true ) : array();
-		$apply_to_products = isset( $_POST['apply_to_products'] ) ? rest_sanitize_boolean( $_POST['apply_to_products'] ) : false;
-
-		if ( ! $template_id ) {
-			wp_send_json_error( 'Template ID es requerido' );
-		}
-
-		// Guardar configuración en Template Manager
-		if ( $this->template_manager->save_config( $template_id, $config ) ) {
-			// Si se solicita, aplicar parámetros a productos de WooCommerce
-			if ( $apply_to_products && isset( $config['settings'] ) ) {
-				$this->apply_template_settings_to_products( $config['settings'] );
-			}
-
-			$this->logger->log( 'SUCCESS', "Template '{$template_id}' configuración guardada" );
-			wp_send_json_success( array(
-				'message' => 'Configuración guardada exitosamente',
-				'template_id' => $template_id,
-			) );
-		} else {
-			wp_send_json_error( 'Error al guardar configuración' );
-		}
-	}
-
-	/**
-	 * Aplicar settings de template a productos de WooCommerce como metatags
-	 *
-	 * @param array $settings Configuración de settings
-	 */
-	private function apply_template_settings_to_products( $settings ) {
-		if ( empty( $settings ) ) {
-			return;
-		}
-
-		// Obtener todos los productos de WooCommerce
-		$products = get_posts( array(
-			'post_type'      => 'product',
-			'numberposts'    => -1,
-			'posts_per_page' => -1,
-		) );
-
-		foreach ( $products as $product_post ) {
-			$product_id = $product_post->ID;
-
-			// Guardar precio por defecto si no existe precio
-			if ( isset( $settings['default_price'] ) && $settings['default_price'] > 0 ) {
-				$current_price = get_post_meta( $product_id, '_price', true );
-				if ( empty( $current_price ) ) {
-					update_post_meta( $product_id, '_price', $settings['default_price'] );
-					update_post_meta( $product_id, '_regular_price', $settings['default_price'] );
-				}
-			}
-
-			// Guardar imagen por defecto si no existe imagen
-			if ( isset( $settings['default_image'] ) && ! empty( $settings['default_image'] ) ) {
-				$image_id = get_post_thumbnail_id( $product_id );
-				if ( empty( $image_id ) ) {
-					$attachment_id = $this->get_or_create_attachment( $settings['default_image'] );
-					if ( $attachment_id ) {
-						set_post_thumbnail( $product_id, $attachment_id );
-					}
-				}
-			}
-
-			// Guardar configuración de visibilidad como metatags
-			if ( isset( $settings['show_category'] ) ) {
-				update_post_meta( $product_id, '_moodle_show_category', rest_sanitize_boolean( $settings['show_category'] ) ? '1' : '0' );
-			}
-			if ( isset( $settings['show_price'] ) ) {
-				update_post_meta( $product_id, '_moodle_show_price', rest_sanitize_boolean( $settings['show_price'] ) ? '1' : '0' );
-			}
-			if ( isset( $settings['show_meta'] ) ) {
-				update_post_meta( $product_id, '_moodle_show_meta', rest_sanitize_boolean( $settings['show_meta'] ) ? '1' : '0' );
-			}
-
-			// Guardar textos de botones
-			if ( isset( $settings['button_text'] ) ) {
-				update_post_meta( $product_id, '_moodle_button_text', sanitize_text_field( $settings['button_text'] ) );
-			}
-			if ( isset( $settings['button_text_enroll'] ) ) {
-				update_post_meta( $product_id, '_moodle_button_text_enroll', sanitize_text_field( $settings['button_text_enroll'] ) );
-			}
-
-			// Guardar layout y columnas
-			if ( isset( $settings['layout'] ) ) {
-				update_post_meta( $product_id, '_moodle_layout', sanitize_text_field( $settings['layout'] ) );
-			}
-			if ( isset( $settings['columns'] ) ) {
-				update_post_meta( $product_id, '_moodle_columns', intval( $settings['columns'] ) );
-			}
-		}
-
-		$this->logger->log( 'SUCCESS', "Template settings aplicados a " . count( $products ) . " productos(s)" );
-	}
-
-	/**
-	 * Obtener o crear attachment desde URL
-	 *
-	 * @param string $image_url URL de imagen
-	 * @return int|bool ID del attachment o false
-	 */
-	private function get_or_create_attachment( $image_url ) {
-		if ( empty( $image_url ) ) {
-			return false;
-		}
-
-		// Descargar imagen con timeout
-		$tmp = download_url( $image_url, 30 );
-		if ( is_wp_error( $tmp ) ) {
-			return false;
-		}
-
-		// Crear attachment
-		$file_array = array(
-			'name'     => basename( $image_url ),
-			'tmp_name' => $tmp,
-		);
-
-		$id = media_handle_sideload( $file_array, 0 );
-
-		if ( is_wp_error( $id ) ) {
-			@unlink( $tmp );
-			return false;
-		}
-
-		return $id;
-	}
-
-	/**
 	 * AJAX Handler para preview de template
 	 */
 	public function ajax_preview_template() {
@@ -613,6 +491,7 @@ class Admin_Settings {
 
 			if ( empty( $template ) ) {
 				wp_send_json_error( 'Template requerido' );
+				die();
 			}
 
 			// Validar que tenemos template_manager
@@ -635,13 +514,16 @@ class Admin_Settings {
 
 			if ( empty( $preview_html ) ) {
 				wp_send_json_error( 'No se pudo generar el preview' );
+				die();
 			}
 
 			wp_send_json_success( array( 'html' => $preview_html ) );
+			die();
 
 		} catch ( \Exception $e ) {
 			$this->logger->log( 'ERROR', 'ajax_preview_template error: ' . $e->getMessage() );
 			wp_send_json_error( 'Error: ' . $e->getMessage() );
+			die();
 		}
 	}
 
@@ -652,38 +534,58 @@ class Admin_Settings {
 		check_ajax_referer( 'woo-otec-moodle-nonce', 'nonce' );
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( 'No autorizado' );
+			die();
 		}
 
-		$template = isset( $_POST['template'] ) ? sanitize_text_field( $_POST['template'] ) : '';
+		$template = isset( $_POST['template_id'] ) ? sanitize_text_field( $_POST['template_id'] ) : '';
 		if ( empty( $template ) ) {
-			$template = isset( $_POST['template_id'] ) ? sanitize_text_field( $_POST['template_id'] ) : '';
+			$template = isset( $_POST['template'] ) ? sanitize_text_field( $_POST['template'] ) : '';
 		}
-
-		$config = isset( $_POST['config'] ) ? json_decode( sanitize_text_field( $_POST['config'] ), true ) : array();
 
 		if ( empty( $template ) ) {
 			wp_send_json_error( 'Template requerido' );
+			die();
 		}
 
-		// Sanitizar y guardar - soportar tanto 'text' como 'settings'
-		$saved_config = array(
-			'colors' => array(
-				'primary'      => isset( $config['colors']['primary'] ) ? sanitize_hex_color( $config['colors']['primary'] ) : '#6366f1',
-				'text'         => isset( $config['colors']['text'] ) ? sanitize_hex_color( $config['colors']['text'] ) : '#1f2937',
-				'text_light'   => isset( $config['colors']['text_light'] ) ? sanitize_hex_color( $config['colors']['text_light'] ) : '#6b7280',
-				'border'       => isset( $config['colors']['border'] ) ? sanitize_hex_color( $config['colors']['border'] ) : '#e5e7eb',
-			),
-			'settings' => array(
-				'title'        => isset( $config['settings']['title'] ) ? sanitize_text_field( $config['settings']['title'] ) : 'Cursos Disponibles',
-				'button_label' => isset( $config['settings']['button_label'] ) ? sanitize_text_field( $config['settings']['button_label'] ) : 'Seleccionar',
-				'cart_label'   => isset( $config['settings']['cart_label'] ) ? sanitize_text_field( $config['settings']['cart_label'] ) : 'Ir al Carrito',
-			),
-		);
+		$config_raw = isset( $_POST['config'] ) ? wp_unslash( $_POST['config'] ) : '{}';
+		$config = json_decode( $config_raw, true );
+		
+		if ( ! is_array( $config ) ) {
+			$config = array();
+		}
 
+		// Preparar configuración sanitizada: solo guardar lo que viene
+		$saved_config = array();
+		
+		// Colores
+		if ( isset( $config['colors'] ) && is_array( $config['colors'] ) ) {
+			$saved_config['colors'] = array();
+			foreach ( $config['colors'] as $color_key => $color_value ) {
+				$saved_config['colors'][ $color_key ] = sanitize_hex_color( $color_value ) ?: '#000000';
+			}
+		} else {
+			$saved_config['colors'] = array();
+		}
+
+		// Settings
+		if ( isset( $config['settings'] ) && is_array( $config['settings'] ) ) {
+			$saved_config['settings'] = array();
+			foreach ( $config['settings'] as $setting_key => $setting_value ) {
+				$saved_config['settings'][ $setting_key ] = sanitize_text_field( $setting_value );
+			}
+		} else {
+			$saved_config['settings'] = array();
+		}
+
+		// Guardar en BD
 		update_option( 'wom_template_config_' . $template, $saved_config );
-		$this->logger->log( 'SUCCESS', "Configuración de template '$template' guardada" );
+		$this->logger->log( 'SUCCESS', "Configuración de template '$template' guardada: " . json_encode( $saved_config ) );
 
-		wp_send_json_success( 'Configuración guardada' );
+		wp_send_json_success( array(
+			'message' => 'Configuración guardada',
+			'config' => $saved_config
+		) );
+		die();
 	}
 
 	/**
@@ -693,18 +595,21 @@ class Admin_Settings {
 		check_ajax_referer( 'woo-otec-moodle-nonce', 'nonce' );
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( 'No autorizado' );
+			die();
 		}
 
 		$template = isset( $_POST['template'] ) ? sanitize_text_field( $_POST['template'] ) : '';
 
 		if ( empty( $template ) ) {
 			wp_send_json_error( 'Template requerido' );
+			die();
 		}
 
 		delete_option( 'wom_template_config_' . $template );
 		$this->logger->log( 'SUCCESS', "Template '$template' reseteado a predeterminados" );
 
 		wp_send_json_success( 'Template reseteado' );
+		die();
 	}
 }
 

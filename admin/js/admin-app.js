@@ -6,7 +6,16 @@
 (function($) {
     'use strict';
 
+    // Validar que el objeto global está disponible
+    if ( typeof wooOtecMoodle === 'undefined' ) {
+        console.error('Error: wooOtecMoodle object not found. Check WordPress localization.');
+        return;
+    }
+
     const WomAdmin = {
+        // Timeout por defecto para AJAX (30 segundos)
+        AJAX_TIMEOUT: 30000,
+
         init: function() {
             this.bindEvents();
         },
@@ -44,6 +53,7 @@
             $.ajax({
                 url: wooOtecMoodle.ajax_url,
                 type: 'POST',
+                timeout: this.AJAX_TIMEOUT,
                 data: {
                     action: 'woo_otec_test_connection',
                     nonce: wooOtecMoodle.nonce
@@ -57,9 +67,13 @@
                         self.notify('error', response.data);
                     }
                 },
-                error: function() {
+                error: function(xhr, status, error) {
                     $result.addClass('error').css({background: '#fee2e2', color: '#991b1b', border: '1px solid #fca5a5'}).html('✗ Error en la conexión').fadeIn();
-                    self.notify('error', 'Error en la comunicación con el servidor.');
+                    if (status === 'timeout') {
+                        self.notify('error', 'Timeout: La conexión tardó demasiado en responder.');
+                    } else {
+                        self.notify('error', 'Error en la comunicación con el servidor: ' + error);
+                    }
                 },
                 complete: function() {
                     $btn.prop('disabled', false).removeClass('loading');
@@ -80,6 +94,7 @@
             $.ajax({
                 url: wooOtecMoodle.ajax_url,
                 type: 'POST',
+                timeout: this.AJAX_TIMEOUT,
                 data: {
                     action: 'woo_otec_test_email',
                     nonce: wooOtecMoodle.nonce
@@ -95,7 +110,11 @@
                 },
                 error: function(xhr, status, error) {
                     $result.addClass('wom-notice-error').html('<strong>✗ Error:</strong> Error en la comunicación con el servidor').fadeIn();
-                    self.notify('error', 'Error fatal al enviar email: ' + error);
+                    if (status === 'timeout') {
+                        self.notify('error', 'Timeout: El servicio tardó demasiado en responder.');
+                    } else {
+                        self.notify('error', 'Error fatal al enviar email: ' + error);
+                    }
                 },
                 complete: function() {
                     $btn.prop('disabled', false);
@@ -119,6 +138,7 @@
             $.ajax({
                 url: wooOtecMoodle.ajax_url,
                 type: 'POST',
+                timeout: this.AJAX_TIMEOUT,
                 data: {
                     action: 'woo_otec_sync_courses',
                     nonce: wooOtecMoodle.nonce
@@ -139,7 +159,11 @@
                 },
                 error: function(xhr, status, error) {
                     self.updateProgress($fill, $status, 0, 'Error crítico');
-                    self.notify('error', 'Error fatal al sincronizar: ' + error);
+                    if (status === 'timeout') {
+                        self.notify('error', 'Timeout: La sincronización tardó demasiado.');
+                    } else {
+                        self.notify('error', 'Error fatal al sincronizar: ' + error);
+                    }
                 },
                 complete: function() {
                     setTimeout(() => {

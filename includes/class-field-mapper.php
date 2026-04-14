@@ -99,16 +99,6 @@ class Field_Mapper {
 	);
 
 	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		// Inicializar mapeos con valores por defecto
-		if ( ! get_option( self::MAPPINGS_OPTION ) ) {
-			add_option( self::MAPPINGS_OPTION, self::DEFAULT_MAPPINGS );
-		}
-	}
-
-	/**
 	 * Obtener todos los mapeos disponibles
 	 */
 	public static function get_all_mappings() {

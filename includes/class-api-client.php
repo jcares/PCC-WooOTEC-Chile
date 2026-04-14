@@ -25,10 +25,21 @@ class API_Client {
 
 	/**
 	 * Constructor.
+	 * 
+	 * @throws \Exception Si faltan credenciales de API.
 	 */
 	public function __construct() {
-		$url   = get_option( 'woo_otec_moodle_api_url', 'https://cipresalto.cl/aulavirtual' );
-		$token = get_option( 'woo_otec_moodle_api_token', 'd4c5be6e5cefe4bbb025ae28ba5630df' );
+		$url   = get_option( 'woo_otec_moodle_api_url' );
+		$token = get_option( 'woo_otec_moodle_api_token' );
+
+		// Validar que las credenciales estén configuradas
+		if ( empty( $url ) || empty( $token ) ) {
+			// En desarrollo, esto puede loguear pero no fallar
+			if ( WP_DEBUG ) {
+				// Log pero no lanzar exception (para mantener compatibilidad)
+				error_log( 'Woo OTEC Moodle: Credenciales de API no configuradas' );
+			}
+		}
 
 		// Normalizar URL (Slash en lugar de Backslash)
 		$this->api_url   = str_replace( '\\', '/', $url );

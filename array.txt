@@ -1,0 +1,358 @@
+Array
+(
+    [​uc_serial] => 12844
+    [​uc_id] => uc_woocommerce_product_grid_elementor_875aed4
+    [​uc_assets_url] => https://wordpress.local/wp-content/uploads/ac_assets/woocommerce_product_grid/
+    [​uc_url_home] => https://wordpress.local
+    [​uc_url_blog] => https://wordpress.local/?post_type=post
+    [​uc_lang] => es
+    [​uc_inside_editor] => yes
+    [​uc_admin_user] => yes
+    [​image_link_type] => Array
+        (
+            [​image_link_type] => 
+            [​image_link_type_link_type] => post
+            [​image_link_type_meta_field] => 
+        )
+
+    [​uc_dynamic_popup_class] => 
+    [​product_button_type] => Array
+        (
+            [​product_button_type] => 
+            [​product_button_type_link_type] => post
+            [​product_button_type_meta_field] => 
+        )
+
+    [​sequence_entrance_animation] => Array
+        (
+            [​sequence_entrance_animation] => 
+            [​sequence_entrance_animation_type] => scale_up
+            [​sequence_entrance_animation_distance] => shortest
+            [​sequence_entrance_animation_duration] => Array
+                (
+                    [​unit] => px
+                    [​size] => 0.6
+                    [​sizes] => Array
+                        (
+                        )
+
+                    [​value] => 0.6
+                )
+
+            [​sequence_entrance_animation_step] => Array
+                (
+                    [​unit] => px
+                    [​size] => 0.3
+                    [​sizes] => Array
+                        (
+                        )
+
+                    [​value] => 0.3
+                )
+
+            [​sequence_entrance_animation_order] => down
+            [​sequence_entrance_animation_blur] => medium
+        )
+
+    [​layout] => under
+    [​items_in_column] => 4
+    [​items_in_column_tablet] => 2
+    [​items_in_column_mobile] => 1
+    [​grid_gap] => 20px
+    [​grid_gap_unit] => px
+    [​grid_gap_nounit] => 20
+    [​grid_gap_tablet] => 
+    [​grid_gap_tablet_unit] => px
+    [​grid_gap_tablet_nounit] => 
+    [​grid_gap_mobile] => 
+    [​grid_gap_mobile_unit] => px
+    [​grid_gap_mobile_nounit] => 
+    [​direction] => ltr
+    [​alignment] => center
+    [​content_padding] => Array
+        (
+            [​unit] => px
+            [​top] => 20
+            [​right] => 20
+            [​bottom] => 20
+            [​left] => 20
+            [​isLinked] => 1
+        )
+
+    [​item_radius] => 0px
+    [​item_radius_unit] => px
+    [​item_radius_nounit] => 0
+    [​grid_max_width] => 
+    [​grid_max_width_unit] => px
+    [​grid_max_width_nounit] => 
+    [​grid_max_width_tablet] => 
+    [​grid_max_width_tablet_unit] => px
+    [​grid_max_width_tablet_nounit] => 
+    [​grid_max_width_mobile] => 
+    [​grid_max_width_mobile_unit] => px
+    [​grid_max_width_mobile_nounit] => 
+    [​content_bg] => #eeeeee
+    [​item_border] => Array
+        (
+            [​border] => 
+            [​width] => 
+            [​width_tablet] => Array
+                (
+                    [​unit] => px
+                    [​top] => 
+                    [​right] => 
+                    [​bottom] => 
+                    [​left] => 
+                    [​isLinked] => 1
+                )
+
+            [​width_mobile] => Array
+                (
+                    [​unit] => px
+                    [​top] => 
+                    [​right] => 
+                    [​bottom] => 
+                    [​left] => 
+                    [​isLinked] => 1
+                )
+
+            [​color] => 
+            [​hover_border] => 
+            [​hover_width] => 
+            [​hover_width_tablet] => Array
+                (
+                    [​unit] => px
+                    [​top] => 
+                    [​right] => 
+                    [​bottom] => 
+                    [​left] => 
+                    [​isLinked] => 1
+                )
+
+            [​hover_width_mobile] => Array
+                (
+                    [​unit] => px
+                    [​top] => 
+                    [​right] => 
+                    [​bottom] => 
+                    [​left] => 
+                    [​isLinked] => 1
+                )
+
+            [​hover_color] => 
+        )
+
+    [​item_shadow] => Array
+        (
+            [​box_shadow_type] => 
+            [​box_shadow] => 
+            [​box_shadow_position] => 
+            [​hover_box_shadow_type] => 
+            [​hover_box_shadow] => 
+            [​hover_box_shadow_position] => 
+        )
+
+    [​content_bg_hover] => 
+    [​procut_button_text] => Detalle Curso
+    [​product_button_icon] => fas fa-info-circle
+    [​product_button_icon_html] => <i class='fas fa-info-circle'></i>
+    [​add_to_cart_button_text] => Add To Cart
+    [​add_to_cart_button_icon] => fas fa-cart-plus
+    [​add_to_cart_button_icon_html] => <i class='fas fa-cart-plus'></i>
+    [​variable_button_text] => View Options
+    [​show_product_button] => true
+    [​open_product_in_new_tab] => _blank
+    [​show_add_to_cart_button] => false
+    [​button_typography] => Array
+        (
+            [​typography] => 
+            [​font_family] => 
+            [​font_size] => 
+            [​font_size_tablet] => Array
+                (
+                    [​unit] => px
+                    [​size] => 
+                    [​sizes] => Array
+                        (
+                        )
+
+                )
+
+            [​font_size_mobile] => Array
+                (
+                    [​unit] => px
+                    [​size] => 
+                    [​sizes] => Array
+                        (
+                        )
+
+                )
+
+            [​font_weight] => 
+            [​text_transform] => 
+            [​font_style] => 
+            [​text_decoration] => 
+            [​line_height] => 
+            [​line_height_tablet] => Array
+                (
+                    [​unit] => em
+                    [​size] => 
+                    [​sizes] => Array
+                        (
+                        )
+
+                )
+
+            [​line_height_mobile] => Array
+                (
+                    [​unit] => em
+                    [​size] => 
+                    [​sizes] => Array
+                        (
+                        )
+
+                )
+
+            [​letter_spacing] => 
+            [​letter_spacing_tablet] => Array
+                (
+                    [​unit] => px
+                    [​size] => 
+                    [​sizes] => Array
+                        (
+                        )
+
+                )
+
+            [​letter_spacing_mobile] => Array
+                (
+                    [​unit] => px
+                    [​size] => 
+                    [​sizes] => Array
+                        (
+                        )
+
+                )
+
+            [​word_spacing] => 
+            [​word_spacing_tablet] => Array
+                (
+                    [​unit] => em
+                    [​size] => 
+                    [​sizes] => Array
+                        (
+                        )
+
+                )
+
+            [​word_spacing_mobile] => Array
+                (
+                    [​unit] => em
+                    [​size] => 
+                    [​sizes] => Array
+                        (
+                        )
+
+                )
+
+        )
+
+    [​button_style] => block
+    [​button_padding] => Array
+        (
+            [​unit] => px
+            [​top] => 10
+            [​right] => 20
+            [​bottom] => 10
+            [​left] => 20
+            [​isLinked] => 1
+        )
+
+    [​button_spacing] => 10px
+    [​button_spacing_unit] => px
+    [​button_spacing_nounit] => 10
+    [​button_bg_color] => #000000
+    [​background_color] => #000000
+    [​button_bg_color_hover] => 
+    [​button_bg_color_hover_copy] => 
+    [​btn_txt_clr] => #ffffff
+    [​text_color] => #ffffff
+    [​btn_txt_clr_hvr] => 
+    [​text_hover] => 
+    [​button_border] => Array
+        (
+            [​border] => 
+            [​width] => 
+            [​width_tablet] => Array
+                (
+                    [​unit] => px
+                    [​top] => 
+                    [​right] => 
+                    [​bottom] => 
+                    [​left] => 
+                    [​isLinked] => 1
+                )
+
+            [​width_mobile] => Array
+                (
+                    [​unit] => px
+                    [​top] => 
+                    [​right] => 
+                    [​bottom] => 
+                    [​left] => 
+                    [​isLinked] => 1
+                )
+
+            [​color] => 
+            [​hover_border] => 
+            [​hover_width] => 
+            [​hover_width_tablet] => Array
+                (
+                    [​unit] => px
+                    [​top] => 
+                    [​right] => 
+                    [​bottom] => 
+                    [​left] => 
+                    [​isLinked] => 1
+                )
+
+            [​hover_width_mobile] => Array
+                (
+                    [​unit] => px
+                    [​top] => 
+                    [​right] => 
+                    [​bottom] => 
+                    [​left] => 
+                    [​isLinked] => 1
+                )
+
+            [​hover_color] => 
+            [​variable_border] => 
+            [​variable_width] => 
+            [​variable_width_tablet] => Array
+                (
+                    [​unit] => px
+                    [​top] => 
+                    [​right] => 
+                    [​bottom] => 
+                    [​left] => 
+                    [​isLinked] => 1
+                )
+
+            [​variable_width_mobile] => Array
+                (
+                    [​unit] => px
+                    [​top] => 
+                    [​right] => 
+                    [​bottom] => 
+                    [​left] => 
+                    [​isLinked] => 1
+                )
+
+            [​variable_color] => 
+            [​hover_variable_border] => 
+            [​hover_variable_width] => 
+            [​hover_variable_width_tablet] => Array
+                (
+                    [​unit] => px
+         …
